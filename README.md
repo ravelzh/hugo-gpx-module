@@ -20,7 +20,7 @@ This project is packaged as a Hugo Module.
 ### 1. Initialize your project (if not already done)
 If your Hugo project is not yet a Go module, initialize it:
 ```bash
-hugo mod init [github.com/your-username/your-project-name](https://github.com/your-username/your-project-name)
+hugo mod init github.com/your-username/your-project-name
 ````
 
 ### 2. Add the Module
