@@ -114,6 +114,28 @@
     .elevation-tooltip * { color: #000000 !important; -webkit-text-fill-color: #000000 !important; }
     .gpx-marker-start { background-color: {{ $markerStartColor }}; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.4); }
     .gpx-marker-end { background-color: {{ $markerEndColor }}; border: 2px solid #fff; border-radius: 2px; box-shadow: 0 0 4px rgba(0,0,0,0.4); }
+
+    @media (max-width: 600px) {
+      .gpx-control-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+      }
+      .gpx-route-controls {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .gpx-route-controls .gpx-btn {
+        width: 100%;
+        margin: 0 !important;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        height: 38px;
+      }
+    }
   </style>
 
   <div class="gpx-map-container" style="width: {{ $width }}; margin: 0 auto;">
@@ -131,7 +153,7 @@
 
     <div class="gpx-route-selector" style="margin-top: 1rem; display: none;" id="{{ $id }}-route-selector">
       <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+        <div class="gpx-control-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
           <h4 style="margin: 0; font-size: 1.1rem; color: #495057 !important;">🗺️ {{ $txtRoutes }}</h4>
           <div class="gpx-route-controls">
             <button class="gpx-btn" id="{{ $id }}-btn-ele" onclick="window.gpxMaps['{{ $id }}']?.toggleElevation()" style="background: #6c757d; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">📈 {{ $txtProfile }}</button>
