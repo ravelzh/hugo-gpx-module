@@ -55,21 +55,35 @@
   <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
   
   <style>
+    /* --- Z-INDEX & LAYERING FIXES (CRITICAL) --- */
+    /* 1. Map Container: Force to bottom */
+    .gpx-map-container, 
+    .gpx-map-container .leaflet-container {
+        z-index: 1 !important; 
+        position: relative !important;
+        isolation: isolate; /* Creates a new stacking context */
+    }
+
+    /* 2. Overlays: Force Galleries, Menus, Modals to top */
+    /* Add any custom classes you use for menus/galleries here */
+    header, nav, .navbar, .menu, 
+    .modal, .lightbox, .fancybox-container, .pswp, .gallery-overlay, .overlay {
+        z-index: 2147483647 !important; /* Max integer value */
+        position: relative; /* z-index only works on positioned elements */
+    }
+    
+    /* Fix for fixed headers */
+    header.fixed, .navbar.fixed-top { position: fixed !important; }
+
     /* --- CSS RESET & DARK MODE PREVENTION --- */
-    /* Nuclear option: Isolate component from parent themes and dark mode plugins */
-    .gpx-map-container, .gpx-map-container * {
+    .gpx-map-container * {
         color-scheme: light !important; 
         forced-color-adjust: none !important;
         box-sizing: border-box;
     }
 
     /* Enforce Light Theme Colors */
-    .gpx-map-container { 
-        text-align: left !important; 
-        font-family: system-ui, -apple-system, sans-serif; 
-        color: #333 !important; 
-    }
-    
+    .gpx-map-container { text-align: left !important; font-family: system-ui, -apple-system, sans-serif; color: #333 !important; }
     .gpx-box-style { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; color: #333 !important; }
     .gpx-item-style { background: #ffffff !important; border: 1px solid #eee; color: #333 !important; }
     .gpx-text-dark { color: #333 !important; }
@@ -93,16 +107,16 @@
 
     /* --- ELEVATION PROFILE (D3) --- */
     .elevation-chart-wrapper {
-        background: #ffffff !important; 
-        border: 1px solid #ddd !important; 
-        border-radius: 8px; 
-        padding: 0; 
+        background: #ffffff !important;
+        border: 1px solid #ddd !important;
+        border-radius: 8px;
+        padding: 0;
         margin-top: 10px;
-        position: relative; 
-        display: none; 
-        overflow: hidden; 
+        position: relative;
+        display: none;
+        overflow: hidden;
     }
-    
+
     /* Strict SVG styling to prevent white text in dark mode */
     .elevation-chart-wrapper svg text, .elevation-chart-wrapper .tick text, .elevation-chart-wrapper .axis text {
         fill: #000000 !important; stroke: none !important; color: #000000 !important;
@@ -112,7 +126,7 @@
     .elevation-chart-wrapper .tick line { stroke: #cccccc !important; }
     .elevation-focus-circle { stroke: #fff; stroke-width: 2px; pointer-events: none; }
     .elevation-focus-line { stroke: #666; stroke-width: 1px; stroke-dasharray: 4; pointer-events: none; }
-    
+
     /* Tooltip Styling */
     .elevation-tooltip {
         position: absolute; background-color: rgba(255, 255, 255, 0.95) !important; color: #000000 !important;
@@ -153,7 +167,7 @@
         <div class="gpx-route-list" id="{{ $id }}-routes"></div>
       </div>
     </div>
-    
+
     {{- if eq $showStats "true" -}}
       <div class="gpx-stats" id="{{ $id }}-stats" style="margin-top: 1rem; display: none;">
         <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
@@ -640,14 +654,14 @@
     /* --- BOOTSTRAP --- */
     const gpxFilesRaw = [];
     {{- range $gpxFiles -}}gpxFilesRaw.push("{{ . }}");{{- end -}}
-    
+
     const config = {
         showStats: {{ $showStats }},
         showMarkers: {{ $showMarkers }},
         markerEndColor: '{{ $markerEndColor }}',
         ele: { active: {{ $showElevation }}, color: '{{ $eleColor }}' }
     };
-    
+
     const handler = new GPXMapHandler('{{ $id }}', '{{ $id }}-stats', gpxFilesRaw, config);
     if(!window.gpxMaps) window.gpxMaps = {};
     window.gpxMaps['{{ $id }}'] = handler;
