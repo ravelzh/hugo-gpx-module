@@ -72,14 +72,13 @@ If you want a clean map without the data dashboard below it:
 {{< gpx-map file="tour.gpx" show-stats="false" height="400px" >}}
 ```
 
-### 2. Dark Mode & Custom Colors
+### 2. Custom Colors
 
-Perfect for dark website themes. This example enables dark mode and changes the markers to Blue (start) and Orange (end).
+This example changes the markers to Blue (start) and Orange (end).
 
 ```go
 {{< gpx-map 
     file="night-ride.gpx" 
-    theme="dark" 
     marker-start-color="#3498db" 
     marker-end-color="#e67e22"
 >}}
