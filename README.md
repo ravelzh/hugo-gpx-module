@@ -9,7 +9,7 @@ A modern, high-performance, and privacy-friendly Hugo module for displaying GPX 
 * **🚀 High Performance:** Uses **Lazy Loading** (IntersectionObserver) to load the map only when visible, and **Canvas Rendering** for handling large GPX files smoothly.
 * **📊 Smart Statistics:** Automatically calculates distance, duration, and elevation gain/loss. Includes **elevation smoothing** to filter out GPS noise (< 5m).
 * **🗺️ Multi-Track Support:** Display up to 20 GPX files on a single map with an interactive toggle list.
-* **🎨 Fully Customizable:** Supports **Dark Mode**, custom marker colors, and responsive sizing via parameters.
+* **🎨 Fully Customizable:** Custom marker colors, and responsive sizing via parameters.
 * **✨ Excellent UX:** Smooth zoom animations (`flyToBounds`), route highlighting on hover, and direct GPX download buttons.
 * **🔒 Privacy Friendly:** Uses OpenStreetMap and OpenTopoMap tiles. No data is sent to Google.
 

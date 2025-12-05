@@ -29,13 +29,12 @@ You can load up to 20 files simultaneously. The list is automatically sorted bas
 
 You can customize almost every aspect of the map using the following parameters:
 
-### Map Dimensions & Theme
+### Map Dimensions
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
 | **width** | `100%` | Width of the map container (e.g., `100%`, `800px`). |
 | **height** | `600px` | Height of the map container. |
-| **theme** | `light` | Map visual style. Options: `light` or `dark`. |
 
 ### Features & Markers
 
@@ -52,6 +51,14 @@ You can customize almost every aspect of the map using the following parameters:
 | :--- | :--- | :--- |
 | **route-min-width** | `300px` | Minimum width for columns in the route selection list. |
 | **stat-min-width** | `110px` | Minimum width for statistic boxes in the dashboard. |
+
+### Elevation Profile
+
+| Parameter | Default | Description |
+| :--- | :--- | :--- |
+| **elevation** | `true` | Controls whether the elevation profile is visible on load (`true` or `false`). |
+| **elevation-height** | `200px` | Height of the chart container (e.g., `200px`, `15rem`). |
+| **elevation-color** | `#2980b9` | Hex color code for the chart line and area fill. |
 
 -----
 
