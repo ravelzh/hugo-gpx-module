@@ -32,7 +32,7 @@ Add the following to your site configuration file:
 ```toml
 [module]
   [[module.imports]]
-    path = "[github.com/ravelzh/hugo-gpx-module](https://github.com/ravelzh/hugo-gpx-module)"
+    path = "github.com/ravelzh/hugo-gpx-module"
 ```
 
 **OR `config.yaml`**
@@ -40,7 +40,7 @@ Add the following to your site configuration file:
 ```yaml
 module:
   imports:
-    - path: [github.com/ravelzh/hugo-gpx-module](https://github.com/ravelzh/hugo-gpx-module)
+    - path: github.com/ravelzh/hugo-gpx-module
 ```
 
 ### 3. Download dependencies
@@ -48,7 +48,7 @@ module:
 Run the following command in your terminal to download the module:
 
 ```bash
-hugo mod get [github.com/ravelzh/hugo-gpx-module](https://github.com/ravelzh/hugo-gpx-module)
+hugo mod get github.com/ravelzh/hugo-gpx-module
 hugo mod tidy
 ```
 
@@ -85,7 +85,7 @@ This module offers extensive configuration options, including:
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome\! Feel free to check the [issues page](https://github.com/ravelzh/hugo-gpx-module/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/ravelzh/hugo-gpx-module/issues).
 
 ## 📄 License
 
