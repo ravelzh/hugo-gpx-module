@@ -28,7 +28,7 @@ You can load up to 20 files simultaneously. The list is automatically sorted bas
 
 ## 🌍 Global Configuration
 
-You can define default settings for **all** maps across your site in your main configuration file (`hugo.toml` or `hugo.ini`). These values will be used unless overridden by a specific shortcode parameter.
+You can define default settings for **all** maps across your site in your main configuration file `hugo.toml`. These values will be used unless overridden by a specific shortcode parameter.
 
 ### TOML Example (`hugo.toml`)
 
@@ -81,53 +81,6 @@ You can define default settings for **all** maps across your site in your main c
   elevation = true
   markers = true
 ```
-
-### INI Example (`hugo.ini`)
-
-```ini
-[params.gpx]
-  # --- Map Provider ---
-  defaultLayer = topo
-
-  # Override URLs
-  osmUrl = https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-  osmAttr = © OpenStreetMap
-  topoUrl = https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
-  topoAttr = © OpenTopoMap
-  satUrl = https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-  satAttr = © Esri
-
-  # --- Default View ---
-  startLat = 48.2082
-  startLon = 16.3738
-  startZoom = 8
-
-  # --- Design & Dimensions ---
-  width = 100%
-  height = 600px
-  routeMinWidth = 380px
-  statMinWidth = 110px
-
-  # Track Style
-  lineWeight = 4
-  lineOpacity = 0.8
-  
-  # Colors (INI requires a specific list syntax or multiple keys depending on parser, 
-  # usually comma-separated strings work for Hugo arrays in INI)
-  trackColors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"]
-
-  # --- Markers & Elevation ---
-  markerStartColor = #2ecc71
-  markerEndColor = #e74c3c
-  elevationHeight = 150px
-  elevationColor = #2980b9
-
-  # --- Default Toggles ---
-  showStats = true
-  elevation = true
-  markers = true
-```
-
 -----
 
 ## ⚙️ Shortcode Parameters
