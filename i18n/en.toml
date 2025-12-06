@@ -1,0 +1,38 @@
+[gpx_summary]
+other = "Summary"
+
+[gpx_route_selection]
+other = "Route Selection"
+
+[gpx_distance]
+other = "Distance"
+
+[gpx_elevation]
+other = "Elevation"
+
+[gpx_total_time]
+other = "Total Time"
+
+[gpx_routes]
+other = "Routes"
+
+[gpx_all]
+other = "All"
+
+[gpx_none]
+other = "None"
+
+[gpx_focus]
+other = "Focus"
+
+[gpx_profile]
+other = "Profile"
+
+[gpx_loading]
+other = "Loading map..."
+
+[gpx_error]
+other = "Error"
+
+[gpx_error_msg]
+other = "At least one GPX file is required."

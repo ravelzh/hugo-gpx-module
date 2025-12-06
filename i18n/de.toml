@@ -1,0 +1,38 @@
+[gpx_summary]
+other = "Zusammenfassung"
+
+[gpx_route_selection]
+other = "Routen-Auswahl"
+
+[gpx_distance]
+other = "Distanz"
+
+[gpx_elevation]
+other = "Höhenmeter"
+
+[gpx_total_time]
+other = "Gesamtzeit"
+
+[gpx_routes]
+other = "Routen"
+
+[gpx_all]
+other = "Alle"
+
+[gpx_none]
+other = "Keine"
+
+[gpx_focus]
+other = "Fokus"
+
+[gpx_profile]
+other = "Profil"
+
+[gpx_loading]
+other = "Karte wird geladen..."
+
+[gpx_error]
+other = "Fehler"
+
+[gpx_error_msg]
+other = "Mindestens eine GPX-Datei erforderlich."

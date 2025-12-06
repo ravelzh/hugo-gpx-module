@@ -1,18 +1,17 @@
 {{- /* --- 1. LANGUAGE SETTINGS --- */ -}}
-{{- $lang := .Page.Lang | default "en" -}}
-{{- $txtSummary := cond (eq $lang "de") "Zusammenfassung" "Summary" -}}
-{{- $txtRoutes := cond (eq $lang "de") "Routen-Auswahl" "Route Selection" -}}
-{{- $txtDist := cond (eq $lang "de") "Distanz" "Distance" -}}
-{{- $txtEle := cond (eq $lang "de") "Höhenmeter" "Elevation" -}}
-{{- $txtTime := cond (eq $lang "de") "Gesamtzeit" "Total Time" -}}
-{{- $txtRouteCount := cond (eq $lang "de") "Routen" "Routes" -}}
-{{- $txtAll := cond (eq $lang "de") "Alle" "All" -}}
-{{- $txtNone := cond (eq $lang "de") "Keine" "None" -}}
-{{- $txtFocus := cond (eq $lang "de") "Fokus" "Focus" -}}
-{{- $txtProfile := cond (eq $lang "de") "Profil" "Profile" -}}
-{{- $txtLoading := cond (eq $lang "de") "Karte wird geladen..." "Loading map..." -}}
-{{- $txtError := cond (eq $lang "de") "Fehler" "Error" -}}
-{{- $txtErrorMsg := cond (eq $lang "de") "Mindestens eine GPX-Datei erforderlich." "At least one GPX file is required." -}}
+{{- $txtSummary := i18n "gpx_summary" | default "Summary" -}}
+{{- $txtRoutes := i18n "gpx_route_selection" | default "Route Selection" -}}
+{{- $txtDist := i18n "gpx_distance" | default "Distance" -}}
+{{- $txtEle := i18n "gpx_elevation" | default "Elevation" -}}
+{{- $txtTime := i18n "gpx_total_time" | default "Total Time" -}}
+{{- $txtRouteCount := i18n "gpx_routes" | default "Routes" -}}
+{{- $txtAll := i18n "gpx_all" | default "All" -}}
+{{- $txtNone := i18n "gpx_none" | default "None" -}}
+{{- $txtFocus := i18n "gpx_focus" | default "Focus" -}}
+{{- $txtProfile := i18n "gpx_profile" | default "Profile" -}}
+{{- $txtLoading := i18n "gpx_loading" | default "Loading map..." -}}
+{{- $txtError := i18n "gpx_error" | default "Error" -}}
+{{- $txtErrorMsg := i18n "gpx_error_msg" | default "At least one GPX file is required." -}}
 
 {{- /* --- 2. GLOBAL CONFIGURATION & DEFAULTS --- */ -}}
 {{- $gpxConf := site.Params.gpx | default dict -}}
