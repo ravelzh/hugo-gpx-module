@@ -86,13 +86,13 @@ Licensed under the Apache License, Version 2.0
   {{- .Page.Scratch.Set "hugo-gpx-module-assets" true -}}
   
   {{- /* 5.1 Vendor Assets */ -}}
-  {{- $leafletCss := resources.Get "hugo-gpx-module/vendor/leaflet/leaflet.css" | minify | fingerprint -}}
+  {{- $leafletCss := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.css" | minify | fingerprint -}}
   <link rel="stylesheet" href="{{ $leafletCss.RelPermalink }}" integrity="{{ $leafletCss.Data.Integrity }}" crossorigin="anonymous">
   
-  {{- $leafletJs := resources.Get "hugo-gpx-module/vendor/leaflet/leaflet.js" | minify | fingerprint -}}
+  {{- $leafletJs := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.js" | minify | fingerprint -}}
   <script src="{{ $leafletJs.RelPermalink }}" integrity="{{ $leafletJs.Data.Integrity }}" crossorigin="anonymous"></script>
 
-  {{- $d3Js := resources.Get "hugo-gpx-module/vendor/d3/d3.min.js" | minify | fingerprint -}}
+  {{- $d3Js := resources.Get "hugo-gpx-module/lib/d3/d3.min.js" | minify | fingerprint -}}
   <script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous"></script>
 
   {{- /* 5.2 Module Assets */ -}}
