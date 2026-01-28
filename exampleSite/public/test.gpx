@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Test" xmlns="http://www.topografix.com/GPX/1/1">
   <trk>
-    <name>Test Track</name>
+    <name>Test Track with an extremely long name that should definitely trigger the overflow mechanism in the responsive layout if it is working correctly - Round 2</name>
     <trkseg>
       <trkpt lat="47.3769" lon="8.5417">
         <ele>408</ele>

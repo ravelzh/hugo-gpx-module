@@ -104,6 +104,8 @@ header.fixed,
   border-radius: 4px !important;
   transition: background 0.2s;
   width: 100%;
+  min-width: 0;
+  /* Critical for Grid item shrinking */
 }
 
 .gpx-route-checkbox {
