@@ -1,0 +1,11 @@
+baseURL = 'http://localhost:1313/'
+languageCode = 'en-us'
+title = 'GPX Module Test Site'
+
+[module]
+  [[module.imports]]
+    path = "github.com/ravelzh/hugo-gpx-module"
+
+[params.gpx]
+  defaultLayer = "osm"
+  showStats = true

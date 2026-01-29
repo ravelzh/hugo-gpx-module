@@ -12,6 +12,7 @@ Map Preview:[Blog Post](https://go-offroad.ch/posts/marokko_2023_01-05_01-12/#tr
 * **🎨 Fully Customizable:** Custom marker colors, and responsive sizing via parameters.
 * **✨ Excellent UX:** Smooth zoom animations (`flyToBounds`), route highlighting on hover, and direct GPX download buttons.
 * **🔒 Privacy Friendly:** Uses OpenStreetMap and OpenTopoMap tiles. No data is sent to Google.
+* **📦 Zero External Dependencies:** All assets (Leaflet, D3) are vendored within the module. No CDNs, fully GDPR compliant and offline-capable.
 
 ## 📦 Installation
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Test" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Test Track with an extremely long name that should definitely trigger the overflow mechanism in the responsive layout if it is working correctly - Round 2</name>
+    <trkseg>
+      <trkpt lat="47.3769" lon="8.5417">
+        <ele>408</ele>
+        <time>2023-01-01T10:00:00Z</time>
+      </trkpt>
+      <trkpt lat="47.3770" lon="8.5420">
+        <ele>410</ele>
+        <time>2023-01-01T10:01:00Z</time>
+      </trkpt>
+      <trkpt lat="47.3780" lon="8.5430">
+        <ele>415</ele>
+        <time>2023-01-01T10:05:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

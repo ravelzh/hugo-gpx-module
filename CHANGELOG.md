@@ -5,6 +5,35 @@ All notable changes to the Hugo GPX Module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4] - 2026-01-29
+
+### Fixed
+- **Layout:** Added `min-width: 0` to grid items in the route selection list to allow proper truncation of long names on mobile devices.
+
+## [1.3.3] - 2026-01-29
+
+### Fixed
+- **Mobile Layout:** Refactored route selection list to use a responsive Flexbox/Grid layout, fixing overflow and button visibility issues on small screens.
+
+## [1.3.2] - 2026-01-29
+
+### Fixed
+- **Assets:** Fixed missing Leaflet icons (layers, markers, shadows) by vendoring them into `static/`.
+
+## [1.3.1] - 2026-01-29
+
+### Fixed
+- **Build Error:** Renamed `vendor` directory to `lib` to prevent Go/Hugo from excluding assets.
+- **Syntax:** Fixed template syntax error in `gpx-map.html`.
+
+## [1.3.0] - 2026-01-28
+
+### Added
+- **Module Initialization:** Full Hugo Module setup with `go.mod` and `module.toml`.
+- **Privacy:** Removed external CDNs; all assets (Leaflet, D3) are now vendored.
+- **Optimization:** Implemented Hugo Pipes for asset processing (SCSS compilation, Minification, Fingerprinting).
+- **Refactoring:** Separated inline CSS/JS into `assets/scss/style.scss` and `assets/js/gpx-map.js`.
+
 ## [1.1.0] - 2025-12-05
 
 ### Added
