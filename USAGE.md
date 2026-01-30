@@ -112,6 +112,8 @@ Any parameter set in the shortcode will override the global configuration.
 | **height** | `600px` | Height of the map container. |
 | **show-stats** | `true` | Shows the dashboard (Distance, Elevation, Time). |
 | **elevation** | `true` | Show/Hide elevation profile on load. |
+| **elevation-height** | `150px` | Height of the elevation chart container. |
+| **elevation-color** | `#2980b9` | Hex color code for the elevation chart fill. |
 | **markers** | `true` | Show/Hide start/end markers. |
 | **show-unit-toggle** | `false` | Shows the km/nm toggle button (defaults to nm). |
 | **show-seamarks** | `false` | Shows the Seamarks layer option in layer control. |
