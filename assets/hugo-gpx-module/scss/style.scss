@@ -274,3 +274,12 @@ header.fixed,
     /* Full width on mobile */
   }
 }
+
+/* Toggle Switch Interaction */
+.gpx-switch input:checked ~ .gpx-slider {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+}
+.gpx-switch input:checked ~ .gpx-slider-knob {
+  transform: translateX(22px);
+}

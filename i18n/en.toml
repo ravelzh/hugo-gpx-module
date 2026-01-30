@@ -36,3 +36,15 @@ other = "Error"
 
 [gpx_error_msg]
 other = "At least one GPX file is required."
+
+[gpx_layer_seamarks]
+other = "Seamarks"
+
+[gpx_layer_standard]
+other = "Standard"
+
+[gpx_layer_topo]
+other = "Topographic"
+
+[gpx_layer_satellite]
+other = "Satellite"
