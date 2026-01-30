@@ -82,7 +82,7 @@ Licensed under the Apache License, Version 2.0
 {{- $gpxFiles := slice -}}
 {{- if .IsNamedParams -}}
 {{- if .Get "file" -}}{{- $gpxFiles = $gpxFiles | append (.Get "file") -}}{{- end -}}
-{{- range $i := seq 2 20 -}}
+{{- range $i := seq 2 100 -}}
 {{- $key := printf "file%d" $i -}}
 {{- if $.Get $key -}}{{- $gpxFiles = $gpxFiles | append ($.Get $key) -}}{{- end -}}
 {{- end -}}

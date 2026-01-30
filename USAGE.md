@@ -14,7 +14,7 @@ To display a single GPX file, simply provide the path. The file should generally
 
 ### Multiple Routes
 
-You can load up to 20 files simultaneously. The list is automatically sorted based on the parameter order (`file` -> `file2` -> `file3`...), ensuring the list order stays consistent regardless of download speed.
+You can load up to 100 files simultaneously. The list is automatically sorted based on the parameter order (`file` -> `file2` -> `file3`...), ensuring the list order stays consistent regardless of download speed.
 
 ```go
 {{< gpx-map 
