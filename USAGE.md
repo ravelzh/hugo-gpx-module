@@ -110,6 +110,8 @@ Any parameter set in the shortcode will override the global configuration.
 | **file** | *Required* | Path to the first GPX file. |
 | **width** | `100%` | Width of the map container. |
 | **height** | `600px` | Height of the map container. |
+| **route-min-width** | `370px` | Minimum width for columns in the route selection list before wrapping. |
+| **stat-min-width** | `110px` | Minimum width for statistic boxes in the dashboard before wrapping. |
 | **show-stats** | `true` | Shows the dashboard (Distance, Elevation, Time). |
 | **elevation** | `true` | Show/Hide elevation profile on load. |
 | **elevation-height** | `150px` | Height of the elevation chart container. |
