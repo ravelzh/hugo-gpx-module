@@ -21,6 +21,53 @@
 
       this.focusMarker = null;
       this.isElevationVisible = this.config.ele.active;
+      this.useNauticalMiles = this.config.showUnitToggle || false; // Default to nm if unit toggle is enabled
+    }
+
+    formatDistance(distKm) {
+      if (this.useNauticalMiles) {
+        return (distKm * 0.539957).toFixed(2) + " nm";
+      }
+      return distKm.toFixed(2) + " km";
+    }
+
+    updateDistanceUnit(isNautical) {
+      this.useNauticalMiles = isNautical;
+
+      this.updateUnitButton();
+      this.updateAllComponents();
+      this.createRouteSelector();
+      this.updatePopups();
+    }
+
+    updateUnitButton() {
+      const btn = document.getElementById(`${this.mapId}-unit-toggle`);
+      if (!btn) return;
+
+      if (this.useNauticalMiles) {
+        btn.textContent = 'nm';
+        btn.style.background = '#0056b3'; // darker blue when active
+      } else {
+        btn.textContent = 'km';
+        btn.style.background = '#17a2b8'; // default teal
+      }
+    }
+
+    updatePopups() {
+      this.routeLayers.forEach((layer, index) => {
+        const stats = this.routeStats.get(index);
+        const data = this.routeData.get(index);
+        const routeName = data.name; /* We might need to store routeName properly or re-access */
+        // Re-bind popup
+        const distStr = this.formatDistance(stats.distance);
+        layer.bindPopup(`
+            <div class="gpx-popup-content">
+                <span class="gpx-popup-title">${routeName}</span>
+                <span class="gpx-popup-stat">📏 Dist: <b>${distStr}</b></span>
+                <span class="gpx-popup-stat">🏔️ Elev: <span style="color:#28a745">↗ ${stats.elevationGain}m</span> <span style="color:#dc3545">↘ ${stats.elevationLoss}m</span></span>
+            </div>
+        `);
+      });
     }
 
     async init() {
@@ -40,23 +87,103 @@
         });
 
         // Dynamic Tile Layers from Config
+        // Dynamic Tile Layers from Config
         const osm = L.tileLayer(this.config.tiles.osm.url, { maxZoom: 19, attribution: this.config.tiles.osm.attr });
         const topo = L.tileLayer(this.config.tiles.topo.url, { maxZoom: 17, attribution: this.config.tiles.topo.attr });
         const satellite = L.tileLayer(this.config.tiles.sat.url, { attribution: this.config.tiles.sat.attr });
+        const sea = L.tileLayer(this.config.tiles.sea.url, { attribution: this.config.tiles.sea.attr });
 
-        const baseMaps = { "Standard": osm, "Topographic": topo, "Satellite": satellite };
+        // Use LayerGroup for Vector Harbors instead of TileLayer
+        const baseMaps = {};
+        baseMaps[this.config.txt.standard] = osm;
+        baseMaps[this.config.txt.topo] = topo;
+        baseMaps[this.config.txt.satellite] = satellite;
+        const overlayMaps = {};
+
+        // Only add Seamarks layer if showSeamarks is enabled (handle string 'true'/'false')
+        const seamarksEnabled = this.config.showSeamarks === true || this.config.showSeamarks === 'true';
+        if (seamarksEnabled) {
+          overlayMaps[this.config.txt.seamarks] = sea;
+          sea.addTo(this.map); // Activate by default
+        }
 
         if (this.config.defaultLayer === 'satellite') satellite.addTo(this.map);
         else if (this.config.defaultLayer === 'topo') topo.addTo(this.map);
         else osm.addTo(this.map);
 
-        L.control.layers(baseMaps, null, { position: 'topright' }).addTo(this.map);
+        L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(this.map);
+
+
 
         // Default View
         this.map.setView([this.config.view.lat, this.config.view.lon], this.config.view.zoom);
         this.setupResizeHandling();
+
+        // Harbor Logic
+
+
         resolve();
       });
+    }
+
+    async loadHarbors() {
+      if (this.map.getZoom() < 10) {
+        this.harborLayer.clearLayers();
+        return; // Too zoomed out
+      }
+
+      const bounds = this.map.getBounds();
+      const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+
+      // Overpass Query
+      const query = `
+        [out:json][timeout:25];
+        (
+          node["harbour"](${bbox});
+          node["leisure"="marina"](${bbox});
+        );
+        out body;
+        >;
+        out skel qt;
+      `;
+
+      try {
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: "data=" + encodeURIComponent(query)
+        });
+        const data = await response.json();
+
+        this.harborLayer.clearLayers();
+
+        data.elements.forEach(el => {
+          if (el.type === 'node' && el.lat && el.lon) {
+            let name = el.tags && el.tags.name ? el.tags.name : "Hafen";
+            let icon = '⚓';
+            if (el.tags && el.tags.leisure === 'marina') icon = '⛵';
+
+            const marker = L.marker([el.lat, el.lon], {
+              icon: L.divIcon({
+                className: 'gpx-harbor-icon',
+                html: `<div style="font-size: 1.2rem; text-shadow: 0 0 2px white;">${icon}</div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+              })
+            });
+
+            let content = `<b>${name}</b>`;
+            if (el.tags) {
+              if (el.tags.website) content += `<br><a href="${el.tags.website}" target="_blank">Webseite</a>`;
+              if (el.tags.phone) content += `<br>Tel: ${el.tags.phone}`;
+            }
+            marker.bindPopup(content);
+            this.harborLayer.addLayer(marker);
+          }
+        });
+      } catch (e) {
+        console.error("Overpass API Error:", e);
+      }
     }
 
     _getDistance(lat1, lon1, lat2, lon2) {
@@ -77,11 +204,39 @@
       if (loader) loader.style.display = 'none';
 
       this.createRouteSelector();
+      this.bindControlEvents();
       this.fitToRoutes();
       if (this.config.showStats) this.calculateAndShowTotalStats();
 
       this.updateElevationButton();
       if (this.isElevationVisible) this._drawElevationProfile();
+    }
+
+    bindControlEvents() {
+      const container = document.getElementById(`${this.mapId}-route-selector`);
+      if (!container) return;
+
+      // Unit Toggle Button
+      const toggle = document.getElementById(`${this.mapId}-unit-toggle`);
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          this.useNauticalMiles = !this.useNauticalMiles;
+          this.updateDistanceUnit(this.useNauticalMiles);
+          this.updateUnitButton();
+        });
+      }
+
+      // Buttons
+      const buttons = container.querySelectorAll('.gpx-route-controls button[data-action]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const action = e.currentTarget.getAttribute('data-action');
+          if (action === 'toggle-elevation') this.toggleElevation();
+          else if (action === 'show-all') this.showAllRoutes();
+          else if (action === 'hide-all') this.hideAllRoutes();
+          else if (action === 'fit-bounds') this.fitToVisibleRoutes();
+        });
+      });
     }
 
     async loadSingleGPX(file, index) {
@@ -145,7 +300,7 @@
       layer.bindPopup(`
             <div class="gpx-popup-content">
                 <span class="gpx-popup-title">${routeName}</span>
-                <span class="gpx-popup-stat">📏 Dist: <b>${stats.distance.toFixed(1)} km</b></span>
+                <span class="gpx-popup-stat">📏 Dist: <b>${this.formatDistance(stats.distance)}</b></span>
                 <span class="gpx-popup-stat">🏔️ Elev: <span style="color:#28a745">↗ ${stats.elevationGain}m</span> <span style="color:#dc3545">↘ ${stats.elevationLoss}m</span></span>
             </div>
         `);
@@ -242,13 +397,13 @@
       const height = container.clientHeight - margin.top - margin.bottom;
       const color = this.config.ele.color;
       const svg = d3.select("#" + containerId).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-      const x = d3.scaleLinear().domain(d3.extent(data, d => d.dist)).range([0, width]);
+      const x = d3.scaleLinear().domain(d3.extent(data, d => this.isNautical ? d.dist * 0.539957 : d.dist)).range([0, width]);
       const yExtent = d3.extent(data, d => d.ele);
       const yPadding = (yExtent[1] - yExtent[0]) * 0.1;
       const y = d3.scaleLinear().domain([yExtent[0] - yPadding, yExtent[1] + yPadding]).range([height, 0]);
 
-      svg.append("path").datum(data).attr("fill", color).attr("fill-opacity", 0.2).attr("stroke", color).attr("stroke-width", 2).attr("d", d3.area().x(d => x(d.dist)).y0(height).y1(d => y(d.ele)));
-      svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(5).tickFormat(d => d + " km"));
+      svg.append("path").datum(data).attr("fill", color).attr("fill-opacity", 0.2).attr("stroke", color).attr("stroke-width", 2).attr("d", d3.area().x(d => x(this.isNautical ? d.dist * 0.539957 : d.dist)).y0(height).y1(d => y(d.ele)));
+      svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(5).tickFormat(d => d.toFixed(1) + (this.isNautical ? " nm" : " km")));
       svg.append("g").call(d3.axisLeft(y).ticks(5));
 
       const focusCircle = svg.append("circle").attr("class", "elevation-focus-circle").attr("r", 5).attr("fill", this.config.markerEndColor).style("opacity", 0);
@@ -259,16 +414,25 @@
         .on("mouseover", () => { focusCircle.style("opacity", 1); focusLine.style("opacity", 1); tooltip.style.display = "block"; this.focusMarker.addTo(this.map); })
         .on("mouseout", () => { focusCircle.style("opacity", 0); focusLine.style("opacity", 0); tooltip.style.display = "none"; this.focusMarker.remove(); })
         .on("mousemove", (event) => {
-          const xDist = x.invert(d3.pointer(event)[0]);
+          const xVal = x.invert(d3.pointer(event)[0]);
+          // Need to find corresponding index. X scale is based on distance.
+          // data.dist is in KM. xVal is in Unit (KM or NM).
+          // Convert xVal back to KM for search if needed, or convert data.dist during search.
+          const distSearch = this.isNautical ? xVal / 0.539957 : xVal;
+
           const bisect = d3.bisector(d => d.dist).left;
-          const idx = bisect(data, xDist, 1);
+          const idx = bisect(data, distSearch, 1);
           const d = data[idx] || data[idx - 1];
           if (!d) return;
-          focusCircle.attr("cx", x(d.dist)).attr("cy", y(d.ele));
-          focusLine.attr("x1", x(d.dist)).attr("x2", x(d.dist));
-          let toolLeft = x(d.dist) + 10;
-          if (toolLeft + 80 > width) toolLeft = x(d.dist) - 90;
-          tooltip.innerHTML = `<strong style="color:#000!important;font-weight:bold;">${d.dist.toFixed(1)} km</strong><br><span style="color:#000!important;">${Math.round(d.ele)} m</span>`;
+
+          // d.dist is KM. Convert for display.
+          const dispDist = this.isNautical ? d.dist * 0.539957 : d.dist;
+
+          focusCircle.attr("cx", x(dispDist)).attr("cy", y(d.ele));
+          focusLine.attr("x1", x(dispDist)).attr("x2", x(dispDist));
+          let toolLeft = x(dispDist) + 10;
+          if (toolLeft + 80 > width) toolLeft = x(dispDist) - 90;
+          tooltip.innerHTML = `<strong style="color:#000!important;font-weight:bold;">${dispDist.toFixed(1)} ${this.isNautical ? "nm" : "km"}</strong><br><span style="color:#000!important;">${Math.round(d.ele)} m</span>`;
           tooltip.style.left = toolLeft + "px"; tooltip.style.top = (y(d.ele) - 30) + "px";
           this.focusMarker.setLatLng([d.lat, d.lon]);
         });
@@ -300,18 +464,26 @@
         const timeStr = s.duration ? `<span class="route-stat-pill gpx-text-muted" title="Duration">⏱ ${this.formatTime(s.duration)}</span>` : '';
 
         div.innerHTML = `
-            <input type="checkbox" class="gpx-route-checkbox" ${visible ? 'checked' : ''} onchange="window.gpxMaps['${this.mapId}'].toggleRoute(${id})">
+            <input type="checkbox" class="gpx-route-checkbox" ${visible ? 'checked' : ''} data-id="${id}">
             <div class="gpx-route-content">
                 <div class="gpx-route-title" title="${d.name}">${d.name}</div>
                 <div class="route-details">
-                    <span class="route-stat-pill gpx-text-muted">📏 ${s.distance.toFixed(1)} km</span>
+                    <span class="route-stat-pill gpx-text-muted">📏 ${this.formatDistance(s.distance)}</span>
                     <span class="route-stat-pill" style="color:#28a745 !important">↗ ${s.elevationGain}m</span>
                     <span class="route-stat-pill" style="color:#dc3545 !important">↘ ${s.elevationLoss}m</span>
                     ${timeStr}
                 </div>
             </div>
-            <button class="gpx-download-btn" onclick="window.gpxMaps['${this.mapId}'].downloadGPX(${id})" title="Download GPX">📥</button>
+            <button class="gpx-download-btn" data-id="${id}" title="Download GPX">📥</button>
           `;
+
+        // Bind item events
+        const checkbox = div.querySelector('.gpx-route-checkbox');
+        checkbox.addEventListener('change', () => this.toggleRoute(id));
+
+        const downloadBtn = div.querySelector('.gpx-download-btn');
+        downloadBtn.addEventListener('click', (e) => { e.stopPropagation(); this.downloadGPX(id); });
+
         list.appendChild(div);
       });
     }
@@ -358,7 +530,10 @@
       this.routeLayers.forEach((l, id) => {
         if (this.map.hasLayer(l)) { c++; const s = this.routeStats.get(id); d += s.distance; eg += s.elevationGain; eloss += s.elevationLoss; time += s.duration; }
       });
-      el.querySelector('[data-stat="distance"]').textContent = d.toFixed(2);
+      el.querySelector('[data-stat="distance"]').textContent = this.formatDistance(d).replace(/ [a-z]+$/, ''); // Remove unit for value
+
+      const distLabel = el.querySelector('[data-stat="distance"]').nextElementSibling;
+      if (distLabel) distLabel.textContent = `Distance (${this.isNautical ? 'nm' : 'km'})`;
 
       el.querySelector('[data-stat="elevation"]').innerHTML = `
           <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; line-height:1.2;">

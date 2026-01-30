@@ -44,11 +44,18 @@ Licensed under the Apache License, Version 2.0
 {{- $markerStartColor := .Get "marker-start-color" | default ($gpxConf.markerStartColor | default "#2ecc71") -}}
 {{- $markerEndColor := .Get "marker-end-color" | default ($gpxConf.markerEndColor | default "#e74c3c") -}}
 
+{{- /* Marine Options */ -}}
+{{- $defUnitToggle := index $gpxConf "showUnitToggle" | default "false" -}}
+{{- $showUnitToggle := .Get "show-unit-toggle" | default $defUnitToggle -}}
+{{- $defSeamarks := index $gpxConf "showSeamarks" | default "false" -}}
+{{- $showSeamarks := .Get "show-seamarks" | default $defSeamarks -}}
+
 {{- /* Track Line Style */ -}}
 {{- $lineWeight := $gpxConf.lineWeight | default 4 -}}
 {{- $lineOpacity := $gpxConf.lineOpacity | default 0.8 -}}
 {{- /* Track Colors */ -}}
-{{- $colorList := $gpxConf.trackColors | default (slice "#e74c3c" "#3498db" "#2ecc71" "#f39c12" "#9b59b6" "#1abc9c" "#e67e22" "#34495e" "#f1c40f" "#e91e63") -}}
+{{- $colorList := $gpxConf.trackColors | default (slice "#e74c3c" "#3498db" "#2ecc71" "#f39c12" "#9b59b6" "#1abc9c"
+"#e67e22" "#34495e" "#f1c40f" "#e91e63") -}}
 
 {{- /* Map Default View */ -}}
 {{- $startLat := $gpxConf.startLat | default 48.2082 -}}
@@ -56,154 +63,197 @@ Licensed under the Apache License, Version 2.0
 {{- $startZoom := $gpxConf.startZoom | default 8 -}}
 
 {{- /* Map Provider Configuration (Tile Layers) */ -}}
+{{- $txtLayerStandard := T "gpx_layer_standard" | default "Standard" -}}
+{{- $txtLayerTopo := T "gpx_layer_topo" | default "Topographic" -}}
+{{- $txtLayerSatellite := T "gpx_layer_satellite" | default "Satellite" -}}
+{{- $txtSeamarks := T "gpx_layer_seamarks" | default "Seamarks" -}}
 {{- $osmUrl := $gpxConf.osmUrl | default "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" -}}
 {{- $osmAttr := $gpxConf.osmAttr | default "© OpenStreetMap" -}}
 {{- $topoUrl := $gpxConf.topoUrl | default "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" -}}
 {{- $topoAttr := $gpxConf.topoAttr | default "© OpenTopoMap" -}}
-{{- $satUrl := $gpxConf.satUrl | default "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" -}}
+{{- $satUrl := $gpxConf.satUrl | default
+"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" -}}
 {{- $satAttr := $gpxConf.satAttr | default "© Esri" -}}
+{{- $osmSeaUrl := "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png" -}}
+{{- $osmSeaAttr := "Map data: © OpenSeaMap contributors" -}}
 {{- $defaultLayer := $gpxConf.defaultLayer | default "osm" -}}
 
 {{- /* --- 3. GPX FILE PARSING --- */ -}}
 {{- $gpxFiles := slice -}}
 {{- if .IsNamedParams -}}
-  {{- if .Get "file" -}}{{- $gpxFiles = $gpxFiles | append (.Get "file") -}}{{- end -}}
-  {{- range $i := seq 2 20 -}}
-    {{- $key := printf "file%d" $i -}}
-    {{- if $.Get $key -}}{{- $gpxFiles = $gpxFiles | append ($.Get $key) -}}{{- end -}}
-  {{- end -}}
+{{- if .Get "file" -}}{{- $gpxFiles = $gpxFiles | append (.Get "file") -}}{{- end -}}
+{{- range $i := seq 2 20 -}}
+{{- $key := printf "file%d" $i -}}
+{{- if $.Get $key -}}{{- $gpxFiles = $gpxFiles | append ($.Get $key) -}}{{- end -}}
+{{- end -}}
 {{- else -}}
-  {{- range .Params -}}{{- $gpxFiles = $gpxFiles | append . -}}{{- end -}}
+{{- range .Params -}}{{- $gpxFiles = $gpxFiles | append . -}}{{- end -}}
 {{- end -}}
 
 {{- /* --- 4. VALIDATION --- */ -}}
 {{- if eq (len $gpxFiles) 0 -}}
-  {{- errorf "hugo-gpx-module: At least one GPX file is required for the gpx-map shortcode (Page: %s)" .Page.Title -}}
+{{- errorf "hugo-gpx-module: At least one GPX file is required for the gpx-map shortcode (Page: %s)" .Page.Title -}}
 {{- end -}}
 
 {{- /* --- 5. ASSET LOADING (ONCE PER PAGE) --- */ -}}
 {{- if not (.Page.Scratch.Get "hugo-gpx-module-assets") -}}
-  {{- .Page.Scratch.Set "hugo-gpx-module-assets" true -}}
-  
-  {{- /* 5.1 Vendor Assets */ -}}
-  {{- $leafletCss := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.css" | minify | fingerprint -}}
-  <link rel="stylesheet" href="{{ $leafletCss.RelPermalink }}" integrity="{{ $leafletCss.Data.Integrity }}" crossorigin="anonymous">
-  
-  {{- $leafletJs := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.js" | minify | fingerprint -}}
-  <script src="{{ $leafletJs.RelPermalink }}" integrity="{{ $leafletJs.Data.Integrity }}" crossorigin="anonymous"></script>
+{{- .Page.Scratch.Set "hugo-gpx-module-assets" true -}}
 
-  {{- $d3Js := resources.Get "hugo-gpx-module/lib/d3/d3.min.js" | minify | fingerprint -}}
-  <script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous"></script>
+{{- /* 5.1 Vendor Assets */ -}}
+{{- $leafletCss := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $leafletCss.RelPermalink }}" integrity="{{ $leafletCss.Data.Integrity }}"
+  crossorigin="anonymous">
 
-  {{- /* 5.2 Module Assets */ -}}
-  {{- $style := resources.Get "hugo-gpx-module/scss/style.scss" | toCSS (dict "targetPath" "css/gpx-module.css" "outputStyle" "compressed") | fingerprint -}}
-  <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+{{- $leafletJs := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.js" | minify | fingerprint -}}
+<script src="{{ $leafletJs.RelPermalink }}" integrity="{{ $leafletJs.Data.Integrity }}"
+  crossorigin="anonymous"></script>
 
-  {{- $script := resources.Get "hugo-gpx-module/js/gpx-map.js" | minify | fingerprint -}}
-  <script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
+{{- $d3Js := resources.Get "hugo-gpx-module/lib/d3/d3.min.js" | minify | fingerprint -}}
+<script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous"></script>
+
+{{- /* 5.2 Module Assets */ -}}
+{{- $style := resources.Get "hugo-gpx-module/scss/style.scss" | toCSS (dict "targetPath" "css/gpx-module.css"
+"outputStyle" "compressed") | fingerprint -}}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+
+{{- $script := resources.Get "hugo-gpx-module/js/gpx-map.js" | minify | fingerprint -}}
+<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
 {{- end -}}
 
 {{- /* --- 6. HTML OUTPUT --- */ -}}
-<div class="gpx-map-container" style="
-  width: {{ $width }}; 
-  margin: 0 auto; 
-  --gpx-route-min-width: {{ $routeMinWidth }};
-  --gpx-stat-min-width: {{ $statMinWidth }};
-  --gpx-marker-start: {{ $markerStartColor }};
-  --gpx-marker-end: {{ $markerEndColor }};
+<section class="gpx-map-container" aria-label="{{ $txtSummary }}" style="
+      width: {{ $width }}; 
+      margin: 0 auto; 
+      --gpx-route-min-width: {{ $routeMinWidth }};
+      --gpx-stat-min-width: {{ $statMinWidth }};
+      --gpx-marker-start: {{ $markerStartColor }};
+      --gpx-marker-end: {{ $markerEndColor }};
 ">
-    
-    <div id="{{ $id }}" class="gpx-map" style="width: 100%; height: {{ $height }}; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; position: relative; background: #f0f0f0 !important;">
-      <div class="gpx-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; text-align: center; pointer-events: none; z-index: 1000;">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗺️</div>
-        <div>{{ $txtLoading }}</div>
-      </div>
-    </div>
-    
-    <div id="{{ $id }}-elevation" class="elevation-chart-wrapper" style="height: {{ $eleHeight }};">
-        <div class="elevation-tooltip" id="{{ $id }}-ele-tooltip"></div>
-    </div>
 
-    <!-- Route Selector -->
-    <div class="gpx-route-selector" style="margin-top: 1rem; display: none;" id="{{ $id }}-route-selector">
-      <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
-        <div class="gpx-control-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-          <h4 style="margin: 0; font-size: 1.1rem; color: #495057 !important;">🗺️ {{ $txtRoutes }}</h4>
-          <div class="gpx-route-controls">
-            <button class="gpx-btn" id="{{ $id }}-btn-ele" onclick="window.gpxMaps['{{ $id }}']?.toggleElevation()" style="background: #6c757d; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">📈 {{ $txtProfile }}</button>
-            <button class="gpx-btn" onclick="window.gpxMaps['{{ $id }}']?.showAllRoutes()" style="background: #28a745; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">{{ $txtAll }}</button>
-            <button class="gpx-btn" onclick="window.gpxMaps['{{ $id }}']?.hideAllRoutes()" style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">{{ $txtNone }}</button>
-            <button class="gpx-btn" onclick="window.gpxMaps['{{ $id }}']?.fitToVisibleRoutes()" style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.8rem;">📍 {{ $txtFocus }}</button>
-          </div>
+  <div id="{{ $id }}" class="gpx-map"
+    style="width: 100%; height: {{ $height }}; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; position: relative; background: #f0f0f0 !important;">
+    <div class="gpx-loading"
+      style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; text-align: center; pointer-events: none; z-index: 1000;">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">🗺️</div>
+      <div>{{ $txtLoading }}</div>
+    </div>
+  </div>
+
+  <div id="{{ $id }}-elevation" class="elevation-chart-wrapper" style="height: {{ $eleHeight }};">
+    <div class="elevation-tooltip" id="{{ $id }}-ele-tooltip"></div>
+  </div>
+
+  <!-- Route Selector -->
+  <div class="gpx-route-selector" style="margin-top: 1rem; display: none;" id="{{ $id }}-route-selector">
+    <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
+      <header class="gpx-control-header"
+        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+        <h4 style="margin: 0; font-size: 1.1rem; color: #495057 !important;">🗺️ {{ $txtRoutes }}</h4>
+        <div class="gpx-route-controls">
+          {{- if eq (printf "%v" $showUnitToggle) "true" -}}
+          <button type="button" class="gpx-btn gpx-unit-btn" id="{{ $id }}-unit-toggle" data-action="unit-toggle"
+            aria-label="Toggle units: Kilometers (km) / Nautical Miles (nm)"
+            style="background: #0056b3; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem; min-width: 2.5rem;"
+            title="Einheiten umschalten: Kilometer (km) ↔ Seemeilen (nm)">nm</button>
+          {{- end -}}
+          <button type="button" class="gpx-btn" id="{{ $id }}-btn-ele" data-action="toggle-elevation"
+            aria-label="{{ $txtProfile }}"
+            style="background: #6c757d; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">📈
+            {{ $txtProfile }}</button>
+          <button type="button" class="gpx-btn" data-action="show-all" aria-label="{{ $txtAll }}"
+            style="background: #28a745; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">{{
+            $txtAll }}</button>
+          <button type="button" class="gpx-btn" data-action="hide-all" aria-label="{{ $txtNone }}"
+            style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem;">{{
+            $txtNone }}</button>
+          <button type="button" class="gpx-btn" data-action="fit-bounds" aria-label="{{ $txtFocus }}"
+            style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.8rem;">📍
+            {{ $txtFocus }}</button>
         </div>
-        <div class="gpx-route-list" id="{{ $id }}-routes"></div>
-      </div>
+      </header>
+      <div class="gpx-route-list" id="{{ $id }}-routes"></div>
     </div>
+  </div>
 
-    <!-- Statistics -->
-    {{- if eq (printf "%v" $showStats) "true" -}}
-      <div class="gpx-stats" id="{{ $id }}-stats" style="margin-top: 1rem; display: none;">
-        <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
-          <h4 style="margin: 0 0 0.75rem 0; font-size: 1.1rem; color: #495057 !important;">📊 {{ $txtSummary }}</h4>
-          <div class="stats-grid">
-            <div class="stat-item gpx-item-style" style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-              <div class="stat-value" data-stat="distance" style="font-weight: bold; color: #28a745 !important; font-size: 1.4rem;">--</div>
-              <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtDist }} (km)</div>
-            </div>
-            <div class="stat-item gpx-item-style" style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
-              <div class="stat-value" data-stat="elevation" style="font-weight: bold; width: 100%;">--</div>
-              <div class="stat-label gpx-text-muted" style="font-size: 0.85rem; margin-top: 4px;">{{ $txtEle }}</div>
-            </div>
-            <div class="stat-item gpx-item-style" style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-              <div class="stat-value" data-stat="time" style="font-weight: bold; color: #6610f2 !important; font-size: 1.4rem;">--</div>
-              <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtTime }}</div>
-            </div>
-            <div class="stat-item gpx-item-style" style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-              <div class="stat-value" data-stat="routeCount" style="font-weight: bold; color: #007bff !important; font-size: 1.4rem;">--</div>
-              <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtRouteCount }}</div>
-            </div>
-          </div>
+  <!-- Statistics -->
+  {{- if eq (printf "%v" $showStats) "true" -}}
+  <div class="gpx-stats" id="{{ $id }}-stats" style="margin-top: 1rem; display: none;">
+    <div class="gpx-box-style" style="border-radius: 8px; padding: 1rem;">
+      <h4 style="margin: 0 0 0.75rem 0; font-size: 1.1rem; color: #495057 !important;">📊 {{ $txtSummary }}</h4>
+      <div class="stats-grid">
+        <div class="stat-item gpx-item-style"
+          style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div class="stat-value" data-stat="distance"
+            style="font-weight: bold; color: #28a745 !important; font-size: 1.4rem;">--</div>
+          <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtDist }} (km)</div>
+        </div>
+        <div class="stat-item gpx-item-style"
+          style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
+          <div class="stat-value" data-stat="elevation" style="font-weight: bold; width: 100%;">--</div>
+          <div class="stat-label gpx-text-muted" style="font-size: 0.85rem; margin-top: 4px;">{{ $txtEle }}</div>
+        </div>
+        <div class="stat-item gpx-item-style"
+          style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div class="stat-value" data-stat="time"
+            style="font-weight: bold; color: #6610f2 !important; font-size: 1.4rem;">--</div>
+          <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtTime }}</div>
+        </div>
+        <div class="stat-item gpx-item-style"
+          style="text-align: center; padding: 0.75rem; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div class="stat-value" data-stat="routeCount"
+            style="font-weight: bold; color: #007bff !important; font-size: 1.4rem;">--</div>
+          <div class="stat-label gpx-text-muted" style="font-size: 0.85rem;">{{ $txtRouteCount }}</div>
         </div>
       </div>
-    {{- end -}}
-</div>
-
+    </div>
+  </div>
+  {{- end -}}
+</section>
 {{- /* --- 7. INITIALIZATION SCRIPT --- */ -}}
 <script>
-  (function() {
+  (function () {
     const config = {
-        showStats: {{ $showStats }},
-        showMarkers: {{ $showMarkers }},
-        ele: { active: {{ $showElevation }}, color: '{{ $eleColor }}' },
-        defaultLayer: '{{ $defaultLayer }}',
-        tiles: {
-            osm: { url: '{{ $osmUrl }}', attr: '{{ $osmAttr | safeJS }}' },
-            topo: { url: '{{ $topoUrl }}', attr: '{{ $topoAttr | safeJS }}' },
-            sat: { url: '{{ $satUrl }}', attr: '{{ $satAttr | safeJS }}' }
-        },
-        view: { lat: {{ $startLat }}, lon: {{ $startLon }}, zoom: {{ $startZoom }} },
-        style: { weight: {{ $lineWeight }}, opacity: {{ $lineOpacity }} },
-        colors: {{ $colorList | jsonify }}
+      showStats: {{ $showStats }},
+      showMarkers: {{ $showMarkers }},
+      ele: { active: {{ $showElevation }}, color: '{{ $eleColor }}' },
+      defaultLayer: '{{ $defaultLayer }}',
+      showUnitToggle: {{ $showUnitToggle }},
+      showSeamarks: {{ $showSeamarks }},
+      tiles: {
+        osm: { url: '{{ $osmUrl }}', attr: '{{ $osmAttr | safeJS }}' },
+        topo: { url: '{{ $topoUrl }}', attr: '{{ $topoAttr | safeJS }}' },
+        sat: { url: '{{ $satUrl }}', attr: '{{ $satAttr | safeJS }}' },
+        sea: { url: '{{ $osmSeaUrl }}', attr: '{{ $osmSeaAttr | safeJS }}' }
+      },
+      view: { lat: {{ $startLat }}, lon: {{ $startLon }}, zoom: {{ $startZoom }} },
+      style: { weight: {{ $lineWeight }}, opacity: {{ $lineOpacity }} },
+      colors: {{ $colorList | jsonify }},
+      txt: {
+        standard: '{{ $txtLayerStandard }}',
+        topo: '{{ $txtLayerTopo }}',
+        satellite: '{{ $txtLayerSatellite }}',
+        seamarks: '{{ $txtSeamarks }}'
+      }
     };
 
     const gpxFiles = [];
-    {{- range $gpxFiles -}}gpxFiles.push("{{ . }}");{{- end -}}
+    {{- range $gpxFiles -}}
+    gpxFiles.push("{{ . }}");
+    {{- end -}}
 
     const initMap = () => {
-        // Ensure GPXMapHandler is available
-        if (typeof GPXMapHandler === 'undefined') { setTimeout(initMap, 50); return; }
-        
-        const handler = new GPXMapHandler('{{ $id }}', '{{ $id }}-stats', gpxFiles, config);
-        if(!window.gpxMaps) window.gpxMaps = {};
-        window.gpxMaps['{{ $id }}'] = handler;
+      if (typeof GPXMapHandler === 'undefined') { setTimeout(initMap, 50); return; }
 
-        // Lazy Load
-        const target = document.getElementById('{{ $id }}');
-        if (!('IntersectionObserver' in window)) { handler.init(); return; }
-        const observer = new IntersectionObserver((entries, obs) => {
-            entries.forEach(entry => { if (entry.isIntersecting) { handler.init(); obs.unobserve(entry.target); } });
-        }, { rootMargin: "200px" });
-        if (target) observer.observe(target);
+      const handler = new GPXMapHandler('{{ $id }}', '{{ $id }}-stats', gpxFiles, config);
+      if (!window.gpxMaps) window.gpxMaps = {};
+      window.gpxMaps['{{ $id }}'] = handler;
+
+      const target = document.getElementById('{{ $id }}');
+      if (!('IntersectionObserver' in window)) { handler.init(); return; }
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { handler.init(); obs.unobserve(entry.target); } });
+      }, { rootMargin: "200px" });
+      if (target) observer.observe(target);
     };
 
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMap); } else { initMap(); }
