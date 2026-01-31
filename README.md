@@ -97,7 +97,18 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 Licensed under the Apache License, Version 2.0. - see [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## � Credits & Attributions
+
+This module is made possible by these awesome open-source projects:
+
+*   **[Leaflet.js](https://leafletjs.com/)** - The interactive mapping library.
+*   **[D3.js](https://d3js.org/)** - For the dynamic elevation profiles.
+*   **[OpenStreetMap](https://www.openstreetmap.org/)** - Standard map data.
+*   **[OpenTopoMap](https://opentopomap.org/)** - Topographic map tiles.
+*   **[Esri / ArcGIS Online](https://www.esri.com/)** - Satellite imagery.
+*   **[OpenSeaMap](https://www.openseamap.org/)** - Nautical seamark overlays.
+
+## �👨‍💻 Author
 
 **Martin Vögeli**
 
