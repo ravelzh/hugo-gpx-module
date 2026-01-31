@@ -108,7 +108,7 @@ This module is made possible by these awesome open-source projects:
 *   **[Esri / ArcGIS Online](https://www.esri.com/)** - Satellite imagery.
 *   **[OpenSeaMap](https://www.openseamap.org/)** - Nautical seamark overlays.
 
-## �👨‍💻 Author
+## 👨‍💻 Author
 
 **Martin Vögeli**
 
