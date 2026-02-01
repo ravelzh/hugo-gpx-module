@@ -2,7 +2,7 @@
 
 A modern, high-performance, and privacy-friendly Hugo module for displaying GPX tracks on interactive maps. Built with [Leaflet.js](https://leafletjs.com/), it requires no heavy dependencies (like jQuery) and is optimized for speed and user experience.
 
-Map Preview:[Blog Post](https://go-offroad.ch/posts/marokko_2023_01-05_01-12/#tracks)
+Map Preview: [Blog Post](https://go-offroad.ch/en/adventures/jtte-tag-138-157-makedonien-bulgarien/#tracks)
 
 ## 🌟 Features
 
