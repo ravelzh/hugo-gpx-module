@@ -8,8 +8,13 @@ Map Preview: [Blog Post](https://go-offroad.ch/en/adventures/jtte-tag-138-157-ma
 
 * **🚀 High Performance:** Uses **Lazy Loading** (IntersectionObserver) to load the map only when visible, and **Canvas Rendering** for handling large GPX files smoothly.
 * **📊 Smart Statistics:** Automatically calculates distance, duration, and elevation gain/loss. Includes **elevation smoothing** to filter out GPS noise (< 5m).
-* **🗺️ Multi-Track Support:** Display up to 20 GPX files on a single map with an interactive toggle list.
-* **🎨 Fully Customizable:** Custom marker colors, and responsive sizing via parameters.
+* **🗺️ Multi-Track Support:** Display up to 100 GPX files on a single map with an interactive toggle list.
+* **📈 Interactive Elevation Profile:** A D3.js-powered elevation chart with mouse-hover synchronization: hover over the chart to see the corresponding point on the map. Toggle visibility on/off.
+* **📋 Route Management:** The sidebar shows a summary per track (distance, elevation, duration) with checkboxes to show/hide tracks, instant GPX download buttons, and "Show All / Hide All / Focus" controls.
+* **🌍 Multiple Map Layers:** Switch between **OpenStreetMap**, **OpenTopoMap**, and **Satellite** imagery via an integrated layer control.
+* **⛵ Nautic Mode:** For marine adventures: toggle between **km** and **Nautical Miles (nm)**, and overlay **OpenSeaMap** seamarks on top of the map.
+* **🌐 i18n Ready:** UI labels are fully translatable via Hugo's `i18n` system. Includes English and German out of the box.
+* **🎨 Fully Customizable:** Custom marker colors, track colors, elevation chart colors, and responsive sizing via parameters.
 * **✨ Excellent UX:** Smooth zoom animations (`flyToBounds`), route highlighting on hover, and direct GPX download buttons.
 * **🔒 Privacy Friendly:** Uses OpenStreetMap and OpenTopoMap tiles. No data is sent to Google.
 * **📦 Zero External Dependencies:** All assets (Leaflet, D3) are vendored within the module. No CDNs, fully GDPR compliant and offline-capable.
@@ -91,6 +96,17 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 📄 License
 
 Licensed under the Apache License, Version 2.0. - see [LICENSE](LICENSE) file for details.
+
+## � Credits & Attributions
+
+This module is made possible by these awesome open-source projects:
+
+*   **[Leaflet.js](https://leafletjs.com/)** - The interactive mapping library.
+*   **[D3.js](https://d3js.org/)** - For the dynamic elevation profiles.
+*   **[OpenStreetMap](https://www.openstreetmap.org/)** - Standard map data.
+*   **[OpenTopoMap](https://opentopomap.org/)** - Topographic map tiles.
+*   **[Esri / ArcGIS Online](https://www.esri.com/)** - Satellite imagery.
+*   **[OpenSeaMap](https://www.openseamap.org/)** - Nautical seamark overlays.
 
 ## 👨‍💻 Author
 
