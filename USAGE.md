@@ -46,7 +46,7 @@ You can define default settings for **all** maps across your site in your main c
 ```toml
 [params.gpx]
   # --- Map Provider (Tile Layers) ---
-  # Default active layer. Options: "osm", "topo", "satellite", "sea"
+  # Default active layer. Options: "osm", "topo", "satellite"
   defaultLayer = "topo"
 
   # Override URLs (optional, e.g. for API keys)
@@ -94,8 +94,9 @@ You can define default settings for **all** maps across your site in your main c
   # --- Default Toggles ---
   showStats = true
   elevation = true
+  elevationInfo = true # Show/Hide elevation numeric data (gain/loss)
   markers = true
-  showUnitToggle = false  # Show km/nm toggle button (starts in nm mode)
+  showUnitToggle = false  # Show km/nm toggle button (defaults to km)
   showSeamarks = false    # Show Seamarks overlay option in layer control
 ```
 
@@ -114,11 +115,12 @@ Any parameter set in the shortcode will override the global configuration.
 | **stat-min-width** | `110px` | Minimum width for statistic boxes in the dashboard before wrapping. |
 | **show-stats** | `true` | Shows the dashboard (Distance, Elevation, Time). |
 | **elevation** | `true` | Show/Hide elevation profile on load. |
+| **elevation-info** | `true` | Show/Hide elevation numeric data (gain/loss). Alias: `elevation_info`. |
 | **elevation-height** | `150px` | Height of the elevation chart container. |
 | **elevation-color** | `#2980b9` | Hex color code for the elevation chart fill. |
 | **markers** | `true` | Show/Hide start/end markers. |
-| **show-unit-toggle** | `false` | Shows the km/nm toggle button (defaults to nm). |
-| **show-seamarks** | `false` | Shows the Seamarks layer option in layer control. |
+| **show-unit-toggle** | `false` | Shows the km/nm toggle button. If enabled, map starts in **nm** mode. |
+| **show-seamarks** | `false` | Enables **Marine Mode**: Adds layers for **Seamarks**, **Harbors**, and **Sea Profile** (GEBCO). |
 | **marker-start-color** | `#2ecc71` | Hex color code for the **Start** marker. |
 | **marker-end-color** | `#e74c3c` | Hex color code for the **End** marker. |
 

@@ -276,10 +276,63 @@ header.fixed,
 }
 
 /* Toggle Switch Interaction */
-.gpx-switch input:checked ~ .gpx-slider {
+.gpx-switch input:checked~.gpx-slider {
   background-color: #007bff !important;
   border-color: #007bff !important;
 }
-.gpx-switch input:checked ~ .gpx-slider-knob {
+
+.gpx-switch input:checked~.gpx-slider-knob {
   transform: translateX(22px);
+}
+
+/* Fullscreen Mode */
+.gpx-map.gpx-fullscreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  /* Max Z-Index to cover headers */
+  background: #f0f0f0 !important;
+  /* Ensure content behind is hidden */
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* Hide external controls when map is fullscreen */
+.gpx-map.gpx-fullscreen~.gpx-route-selector,
+.gpx-map.gpx-fullscreen~.gpx-stats,
+.gpx-map.gpx-fullscreen~.elevation-chart-wrapper {
+  display: none !important;
+}
+/* Fullscreen Mode (Applied to Container) */
+.gpx-map-container.gpx-fullscreen-mode {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: #f0f0f0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  isolation: auto !important;
+
+  /* Force map to fill container */
+  .gpx-map {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Hide external controls */
+  .gpx-route-selector,
+  .gpx-stats,
+  .elevation-chart-wrapper {
+    display: none !important;
+  }
 }

@@ -12,10 +12,10 @@ Map Preview: [Blog Post](https://go-offroad.ch/en/adventures/jtte-tag-138-157-ma
 * **📈 Interactive Elevation Profile:** A D3.js-powered elevation chart with mouse-hover synchronization: hover over the chart to see the corresponding point on the map. Toggle visibility on/off.
 * **📋 Route Management:** The sidebar shows a summary per track (distance, elevation, duration) with checkboxes to show/hide tracks, instant GPX download buttons, and "Show All / Hide All / Focus" controls.
 * **🌍 Multiple Map Layers:** Switch between **OpenStreetMap**, **OpenTopoMap**, and **Satellite** imagery via an integrated layer control.
-* **⛵ Nautic Mode:** For marine adventures: toggle between **km** and **Nautical Miles (nm)**, and overlay **OpenSeaMap** seamarks on top of the map.
+* **⛵ Nautic Mode:** For marine adventures: toggle between **km** and **Nautical Miles (nm)**. Enables **Marine Mode** to overlay **OpenSeaMap** seamarks, display **Harbors** with contact info, and show **Sea Depth Profiles** (GEBCO).
 * **🌐 i18n Ready:** UI labels are fully translatable via Hugo's `i18n` system. Includes English and German out of the box.
 * **🎨 Fully Customizable:** Custom marker colors, track colors, elevation chart colors, and responsive sizing via parameters.
-* **✨ Excellent UX:** Smooth zoom animations (`flyToBounds`), route highlighting on hover, and direct GPX download buttons.
+* **✨ Excellent UX:** Smooth zoom animations (`flyToBounds`), route highlighting on hover, direct GPX download buttons, and **Fullscreen mode**.
 * **🔒 Privacy Friendly:** Uses OpenStreetMap and OpenTopoMap tiles. No data is sent to Google.
 * **📦 Zero External Dependencies:** All assets (Leaflet, D3) are vendored within the module. No CDNs, fully GDPR compliant and offline-capable.
 

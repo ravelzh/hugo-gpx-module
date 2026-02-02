@@ -5,6 +5,21 @@ All notable changes to the Hugo GPX Module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-02-02
+
+### Added
+- **Marine Mode:** Enhanced Nautic Mode to include **OpenSeaMap Seamarks**, **Harbors** (with website/phone info), and **Sea Depth Profiles** (GEBCO).
+- **Fullscreen:** Added a dedicated Fullscreen control that isolates the map container (Z-Index fix) to prevent UI overlapping.
+- **i18n:** Fully internationalized UI (English/German). All strings (`gpx_distance`, `gpx_download`, etc.) are now translatable via TOML files.
+
+### Changed
+- **Unit Toggle:** Enabling `show-unit-toggle` now automatically defaults the map to **Nautical Miles (nm)**.
+- **Documentation:** Updated `README.md` and `USAGE.md` to reflect new Marine features and i18n capabilities.
+
+### Fixed
+- **Configuration:** The `elevation-info="false"` parameter now correctly hides elevation statistics in the summary, popups, and route list (handled string/boolean type mismatch).
+- **Stability:** Hardened `gpx-map.html` against corruption by adding explicit config markers.
+
 ## [1.3.4] - 2026-01-29
 
 ### Fixed

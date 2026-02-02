@@ -1,0 +1,11 @@
+# Agent
+.agent/
+
+# Hugo
+resources/_gen/
+public/
+.hugo_build.lock
+
+# OS
+.DS_Store
+Thumbs.db

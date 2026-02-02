@@ -17,6 +17,10 @@ Licensed under the Apache License, Version 2.0
 {{- $txtLoading := i18n "gpx_loading" | default "Loading map..." -}}
 {{- $txtError := i18n "gpx_error" | default "Error" -}}
 {{- $txtErrorMsg := i18n "gpx_error_msg" | default "At least one GPX file is required." -}}
+{{- $txtDownload := i18n "gpx_download" | default "Download GPX" -}}
+{{- $txtWebsite := i18n "gpx_website" | default "Website" -}}
+{{- $txtPhone := i18n "gpx_phone" | default "Tel" -}}
+{{- $txtHarbor := i18n "gpx_harbor" | default "Harbor" -}}
 
 {{- /* --- 2. GLOBAL CONFIGURATION & DEFAULTS --- */ -}}
 {{- $gpxConf := site.Params.gpx | default dict -}}
@@ -37,6 +41,8 @@ Licensed under the Apache License, Version 2.0
 {{- $showElevation := .Get "elevation" | default $defEle -}}
 {{- $eleHeight := .Get "elevation-height" | default ($gpxConf.elevationHeight | default "150px") -}}
 {{- $eleColor := .Get "elevation-color" | default ($gpxConf.elevationColor | default "#2980b9") -}}
+{{- $defEleInfo := index $gpxConf "elevationInfo" | default "true" -}}
+{{- $showEleInfo := .Get "elevation-info" | default (.Get "elevation_info" | default $defEleInfo) -}}
 
 {{- /* Marker Config */ -}}
 {{- $defMarkers := index $gpxConf "markers" | default "true" -}}
@@ -211,51 +217,58 @@ Licensed under the Apache License, Version 2.0
 </section>
 {{- /* --- 7. INITIALIZATION SCRIPT --- */ -}}
 <script>
-  (function () {
-    const config = {
-      showStats: {{ $showStats }},
-      showMarkers: {{ $showMarkers }},
-      ele: { active: {{ $showElevation }}, color: '{{ $eleColor }}' },
-      defaultLayer: '{{ $defaultLayer }}',
-      showUnitToggle: {{ $showUnitToggle }},
-      showSeamarks: {{ $showSeamarks }},
-      tiles: {
-        osm: { url: '{{ $osmUrl }}', attr: '{{ $osmAttr | safeJS }}' },
-        topo: { url: '{{ $topoUrl }}', attr: '{{ $topoAttr | safeJS }}' },
-        sat: { url: '{{ $satUrl }}', attr: '{{ $satAttr | safeJS }}' },
-        sea: { url: '{{ $osmSeaUrl }}', attr: '{{ $osmSeaAttr | safeJS }}' }
-      },
-      view: { lat: {{ $startLat }}, lon: {{ $startLon }}, zoom: {{ $startZoom }} },
-      style: { weight: {{ $lineWeight }}, opacity: {{ $lineOpacity }} },
-      colors: {{ $colorList | jsonify }},
-      txt: {
-        standard: '{{ $txtLayerStandard }}',
-        topo: '{{ $txtLayerTopo }}',
-        satellite: '{{ $txtLayerSatellite }}',
-        seamarks: '{{ $txtSeamarks }}'
-      }
-    };
+(function () {
+  /* --- CONFIG START --- */
+  const config = {
+    showStats: {{ $showStats }},
+    showMarkers: {{ $showMarkers }},
+    ele: { active: {{ $showElevation }}, info: {{ $showEleInfo }}, color: '{{ $eleColor }}' },
+    defaultLayer: '{{ $defaultLayer }}',
+    showUnitToggle: {{ $showUnitToggle }},
+    showSeamarks: {{ $showSeamarks }},
+    tiles: {
+      osm: { url: '{{ $osmUrl }}', attr: '{{ $osmAttr | safeJS }}' },
+      topo: { url: '{{ $topoUrl }}', attr: '{{ $topoAttr | safeJS }}' },
+      sat: { url: '{{ $satUrl }}', attr: '{{ $satAttr | safeJS }}' },
+      sea: { url: '{{ $osmSeaUrl }}', attr: '{{ $osmSeaAttr | safeJS }}' }
+    },
+    view: { lat: {{ $startLat }}, lon: {{ $startLon }}, zoom: {{ $startZoom }} },
+    style: { weight: {{ $lineWeight }}, opacity: {{ $lineOpacity }} },
+    colors: {{ $colorList | jsonify }},
+    txt: {
+      standard: '{{ $txtLayerStandard }}',
+      topo: '{{ $txtLayerTopo }}',
+      satellite: '{{ $txtLayerSatellite }}',
+      seamarks: '{{ $txtSeamarks }}',
+      download: '{{ $txtDownload }}',
+      website: '{{ $txtWebsite }}',
+      phone: '{{ $txtPhone }}',
+      harbor: '{{ $txtHarbor }}',
+      distance: '{{ $txtDist }}'
+    }
+  };
+  /* --- CONFIG END --- */
 
-    const gpxFiles = [];
-    {{- range $gpxFiles -}}
-    gpxFiles.push("{{ . }}");
-    {{- end -}}
+  const gpxFiles = [];
+  {{- range $gpxFiles -}}
+  gpxFiles.push("{{ . }}");
+  {{- end -}}
 
-    const initMap = () => {
-      if (typeof GPXMapHandler === 'undefined') { setTimeout(initMap, 50); return; }
+  const initMap = () => {
+    if (typeof GPXMapHandler === 'undefined') { setTimeout(initMap, 50); return; }
 
-      const handler = new GPXMapHandler('{{ $id }}', '{{ $id }}-stats', gpxFiles, config);
-      if (!window.gpxMaps) window.gpxMaps = {};
-      window.gpxMaps['{{ $id }}'] = handler;
+    const handler = new GPXMapHandler('{{ $id }}', '{{ $id }}-stats', gpxFiles, config);
+    if (!window.gpxMaps) window.gpxMaps = {};
+    window.gpxMaps['{{ $id }}'] = handler;
 
-      const target = document.getElementById('{{ $id }}');
-      if (!('IntersectionObserver' in window)) { handler.init(); return; }
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => { if (entry.isIntersecting) { handler.init(); obs.unobserve(entry.target); } });
-      }, { rootMargin: "200px" });
-      if (target) observer.observe(target);
-    };
+    const target = document.getElementById('{{ $id }}');
+    if (!('IntersectionObserver' in window)) { handler.init(); return; }
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { handler.init(); obs.unobserve(entry.target); } });
+    }, { rootMargin: "200px" });
+    if (target) observer.observe(target);
+  };
 
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMap); } else { initMap(); }
-  })();
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMap); } else { initMap(); }
+})();
 </script>
