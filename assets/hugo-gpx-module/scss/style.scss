@@ -6,11 +6,6 @@
   isolation: isolate;
 }
 
-/* FIX: Removed generic 'header' selector to prevent z-index conflicts.
-   The broad 'header' rule was setting z-index: 2147483647 on ALL header elements,
-   including article/post title headers (e.g. Blowfish's #single_header), causing
-   the mobile navigation menu to be rendered below the post title on mobile devices.
-   Only specific overlay/navigation-related elements need this high z-index. */
 nav,
 .navbar,
 .menu,
