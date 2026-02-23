@@ -6,7 +6,11 @@
   isolation: isolate;
 }
 
-header,
+/* FIX: Removed generic 'header' selector to prevent z-index conflicts.
+   The broad 'header' rule was setting z-index: 2147483647 on ALL header elements,
+   including article/post title headers (e.g. Blowfish's #single_header), causing
+   the mobile navigation menu to be rendered below the post title on mobile devices.
+   Only specific overlay/navigation-related elements need this high z-index. */
 nav,
 .navbar,
 .menu,
@@ -20,10 +24,17 @@ nav,
   position: relative;
 }
 
+/* Explicitly reset article/post header stacking to avoid conflicts with site navigation */
+#single_header {
+  z-index: auto !important;
+  position: static !important;
+}
+
 header.fixed,
 .navbar.fixed-top {
   position: fixed !important;
 }
+
 
 .gpx-map-container * {
   color-scheme: light !important;
@@ -307,6 +318,7 @@ header.fixed,
 .gpx-map.gpx-fullscreen~.elevation-chart-wrapper {
   display: none !important;
 }
+
 /* Fullscreen Mode (Applied to Container) */
 .gpx-map-container.gpx-fullscreen-mode {
   position: fixed !important;
