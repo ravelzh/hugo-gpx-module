@@ -622,7 +622,7 @@
         div.style.borderLeft = `5px solid ${visible ? d.color : '#ccc'}`;
         div.onmouseenter = () => this.highlightRoute(id, true);
         div.onmouseleave = () => this.highlightRoute(id, false);
-        const timeStr = s.duration ? `<span class="route-stat-pill gpx-text-muted" title="${this.config.txt.duration}">⏱ ${this.formatTime(s.duration)}</span>` : '';
+        const timeStr = s.duration ? `<span class="route-stat-pill gpx-text-muted" title="${escapeHtml(this.config.txt.duration)}">⏱ ${this.formatTime(s.duration)}</span>` : '';
         const showEleInfo = String(this.config.ele.info) !== 'false';
         let elePills = '';
         if (showEleInfo) {
@@ -635,14 +635,14 @@
         div.innerHTML = `
             <input type="checkbox" class="gpx-route-checkbox" ${visible ? 'checked' : ''} data-id="${id}">
             <div class="gpx-route-content">
-                <div class="gpx-route-title" title="${d.name}">${d.name}</div>
+                <div class="gpx-route-title" title="${escapeHtml(d.name)}">${escapeHtml(d.name)}</div>
                 <div class="route-details">
                     <span class="route-stat-pill gpx-text-muted">📏 ${this.formatDistance(s.distance)}</span>
                     ${elePills}
                     ${timeStr}
                 </div>
             </div>
-            <button class="gpx-download-btn" data-id="${id}" title="${this.config.txt.download}">📥</button>
+            <button class="gpx-download-btn" data-id="${id}" title="${escapeHtml(this.config.txt.download)}">📥</button>
           `;
 
         const checkbox = div.querySelector('.gpx-route-checkbox');

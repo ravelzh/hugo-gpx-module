@@ -1,5 +1,6 @@
 # Agent
 .agent/
+.goosehints
 
 # Hugo
 resources/_gen/

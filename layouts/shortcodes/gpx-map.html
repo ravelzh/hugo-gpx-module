@@ -133,8 +133,8 @@ Licensed under the Apache License, Version 2.0
 {{- end -}}
 
 {{- /* --- 5. ASSET LOADING (ONCE PER PAGE) --- */ -}}
-{{- if not (.Page.Scratch.Get "hugo-gpx-module-assets") -}}
-{{- .Page.Scratch.Set "hugo-gpx-module-assets" true -}}
+{{- if not (.Page.Store.Get "hugo-gpx-module-assets") -}}
+{{- .Page.Store.Set "hugo-gpx-module-assets" true -}}
 
 {{- /* 5.1 Vendor Assets */ -}}
 {{- $leafletCss := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.css" | minify | fingerprint -}}
