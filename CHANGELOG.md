@@ -5,6 +5,14 @@ All notable changes to the Hugo GPX Module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2026-10-29
+
+### Changed
+- **Script loading:** the vendor and module scripts now use `defer`, so they no longer block HTML parsing. Execution order stays leaflet → d3 → module.
+
+### Added
+- **Tests:** guards for `defer` and script order, a late-loading module script, and a check that hostile shortcode parameters cannot break out of the inline config script.
+
 ## [1.5.6] - 2026-10-29
 
 ### Fixed

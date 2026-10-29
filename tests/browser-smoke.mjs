@@ -99,6 +99,14 @@ title: "Global L shadowing"
 {{< gpx-map file="gpx/global.gpx" file2="gpx/global.gpx" height="400px" >}}
 `);
 
+  // Fixture: hostile shortcode parameter must not break out of the config script.
+  await writeFile(join(SITE, 'content/escaping.md'), `---
+title: "Escaping"
+---
+
+{{< gpx-map file="gpx/global.gpx" height="300px" elevation-color="x'</script><img src=x onerror=alert(1)>" >}}
+`);
+
   // Fixture: path resolution variants.
   await writeFile(join(SITE, 'content/paths.md'), `---
 title: "Path resolution"
@@ -280,6 +288,60 @@ try {
       (await readFile(join(SITE, 'public/bundle-test/index.html'), 'utf8')).includes('bundle-test\\/track.gpx'));
     check('global asset still resolves',
       (await readFile(join(SITE, 'public/bundle-test/index.html'), 'utf8')).includes('\\/gpx\\/global.gpx'));
+  }
+
+  section('Script loading (defer)');
+  {
+    const html = await readFile(join(SITE, 'public/index.html'), 'utf8');
+    const tags = [...html.matchAll(/<script src="([^"]*)"[^>]*>/g)];
+    const deferred = tags.filter(t => /\sdefer(\s|>)/.test(t[0]));
+    check('all vendor and module scripts use defer', tags.length >= 3 && deferred.length === tags.length,
+      `${deferred.length}/${tags.length}: ${tags.map(t => t[1].split('/').pop()).join(', ')}`);
+    check('document order is leaflet, d3, module',
+      /leaflet\.min.*\.js"[^>]*defer/.test(html) &&
+      html.indexOf('leaflet.min') < html.indexOf('d3.min') &&
+      html.indexOf('d3.min') < html.indexOf('gpx-map.min'));
+
+    // the inline init script polls for GPXMapHandler; a deferred module script
+    // must still be picked up
+    const { page, errors } = await loadPage(ctx, base + '/', {
+      origin: base,
+      route: p => p.route('**/js/gpx-map.min.*.js', async r => { await wait(1500); await r.continue(); }),
+    });
+    await page.locator('.gpx-map').first().scrollIntoViewIfNeeded();
+    await wait(4000);
+    const state = await mapState(page);
+    check('map initialises when the module script arrives late', state[0].init, JSON.stringify(state[0]));
+    check('no console errors', errors.length === 0, errors.join('\n       '));
+    await page.close();
+  }
+
+  section('Escaping of shortcode parameters');
+  {
+    const html = await readFile(join(SITE, 'public/escaping/index.html'), 'utf8');
+    check('payload does not break out of the script tag', !html.includes('<img src=x'), 'raw payload found in HTML');
+    check('payload is escaped in the config', /\\u003c|\\x3c/.test(html), 'no escaped < found');
+    const { page, errors } = await loadPage(ctx, base + '/escaping/', { origin: base });
+    await page.locator('.gpx-map').first().scrollIntoViewIfNeeded();
+    await wait(2500);
+    const state = await mapState(page);
+    check('page still renders a map', state.length === 1 && state[0].init, JSON.stringify(state));
+    check('no uncaught exceptions', errors.filter(e => e.startsWith('pageerror')).length === 0, errors.join('\n       '));
+    await page.close();
+  }
+
+  section('No IntersectionObserver (fallback path)');
+  {
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', e => errors.push(String(e.message).split('\n')[0]));
+    await page.addInitScript(() => { delete window.IntersectionObserver; });
+    await page.goto(base + '/bundle-test/', { waitUntil: 'load' });
+    await wait(2500);
+    const state = await mapState(page);
+    check('maps initialise without IntersectionObserver', state.length === 2 && state.every(m => m.init), JSON.stringify(state.map(m => m.init)));
+    check('no uncaught exceptions', errors.length === 0, errors.join('\n       '));
+    await page.close();
   }
 
   section('Unit toggle (nautical)');

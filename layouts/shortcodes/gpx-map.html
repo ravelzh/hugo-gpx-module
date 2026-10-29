@@ -143,17 +143,17 @@ Licensed under the Apache License, Version 2.0
 
 {{- $leafletJs := resources.Get "hugo-gpx-module/lib/leaflet/leaflet.js" | minify | fingerprint -}}
 <script src="{{ $leafletJs.RelPermalink }}" integrity="{{ $leafletJs.Data.Integrity }}"
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous" defer></script>
 
 {{- $d3Js := resources.Get "hugo-gpx-module/lib/d3/d3.min.js" | minify | fingerprint -}}
-<script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous"></script>
+<script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous" defer></script>
 
 {{- /* 5.2 Module Assets */ -}}
 {{- $style := resources.Get "hugo-gpx-module/css/style.css" | minify | resources.Copy "css/gpx-module.css" | fingerprint -}}
 <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
 
 {{- $script := resources.Get "hugo-gpx-module/js/gpx-map.js" | minify | fingerprint -}}
-<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
+<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}" defer></script>
 {{- end -}}
 
 {{- /* --- 6. HTML OUTPUT --- */ -}}
