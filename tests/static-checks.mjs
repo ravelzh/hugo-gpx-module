@@ -73,6 +73,28 @@ const fail = (name, detail) => { failed++; console.log(`  FAIL ${name}\n       $
   if (!/function getLeaflet\(\)/.test(readFileSync(JS, 'utf8'))) fail('getLeaflet() helper present', 'missing');
 }
 
+// ------------------------------------------------------------------ i18n
+// Every UI string must come from i18n; de/en have to stay in sync.
+{
+  const read = f => readFileSync(join(ROOT, 'i18n', f), 'utf8');
+  const keys = t => new Set([...t.matchAll(/^\[([a-zA-Z0-9_]+)\]/gm)].map(m => m[1]));
+  const de = keys(read('de.toml')), en = keys(read('en.toml'));
+  const onlyDe = [...de].filter(k => !en.has(k));
+  const onlyEn = [...en].filter(k => !de.has(k));
+  if (onlyDe.length || onlyEn.length) {
+    fail('i18n keys de/en in sync', `only de: ${onlyDe.join(', ') || '-'} | only en: ${onlyEn.join(', ') || '-'}`);
+  } else pass('i18n keys de/en in sync', `${de.size} keys`);
+
+  const js = readFileSync(JS, 'utf8');
+  const hardcoded = ['Häfen', 'Vollbild', 'Meeresprofil'].filter(s => js.includes(s));
+  if (hardcoded.length) fail('no hardcoded UI strings in JS', hardcoded.join(', '));
+  else pass('no hardcoded UI strings in JS');
+
+  const usesTxt = (js.match(/this\.config\.txt\./g) || []).length;
+  if (usesTxt < 10) fail('UI strings come from config.txt', `only ${usesTxt} usages`);
+  else pass('UI strings come from config.txt', `${usesTxt} usages`);
+}
+
 // ------------------------------------------------------------ css delivery
 // The stylesheet is plain CSS; it must not go through a Sass transpiler again
 // (libsass raised a deprecation warning in Hugo >= 0.153).

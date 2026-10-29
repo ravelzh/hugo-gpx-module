@@ -282,6 +282,36 @@ try {
       (await readFile(join(SITE, 'public/bundle-test/index.html'), 'utf8')).includes('\\/gpx\\/global.gpx'));
   }
 
+  section('Unit toggle (nautical)');
+  {
+    const { page, errors } = await loadPage(ctx, base + '/marine/', { origin: base });
+    await page.locator('.gpx-map').first().scrollIntoViewIfNeeded();
+    await wait(2500);
+    const read = () => page.evaluate(() => {
+      const sec = document.querySelector('.gpx-map-container');
+      const svg = sec.querySelector('.elevation-chart-wrapper svg');
+      const ticks = svg ? [...svg.querySelectorAll('text')].map(t => t.textContent.trim()).filter(Boolean) : [];
+      return {
+        summaryUnit: /\((\w+)\)/.exec(sec.querySelector('[data-stat="distance"]')?.nextElementSibling?.textContent.trim() || '')?.[1] || null,
+        axisUnit: (ticks.find(t => /\bkm\b|\bnm\b/.test(t)) || '').split(' ').pop() || null,
+        eleAxis: ticks.filter(t => /^\d+$/.test(t)).length,
+      };
+    });
+    const before = await read();
+    check('marine map defaults to nautical miles', before.summaryUnit === 'nm' && before.axisUnit === 'nm', JSON.stringify(before));
+    check('elevation chart drawn', before.eleAxis > 0, JSON.stringify(before));
+    await page.locator('[data-action="unit-toggle"]').first().click();
+    await wait(1200);
+    const after = await read();
+    check('toggle switches summary and chart to km', after.summaryUnit === 'km' && after.axisUnit === 'km', JSON.stringify(after));
+    await page.locator('[data-action="unit-toggle"]').first().click();
+    await wait(1200);
+    const back = await read();
+    check('toggle switches back to nm', back.summaryUnit === 'nm' && back.axisUnit === 'nm', JSON.stringify(back));
+    check('no console errors', errors.length === 0, errors.join('\n       '));
+    await page.close();
+  }
+
   section('Leaflet arrives late (retry path)');
   {
     const { page, errors } = await loadPage(ctx, base + '/bundle-test/', {

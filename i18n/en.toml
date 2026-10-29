@@ -60,3 +60,18 @@ other = "Tel"
 
 [gpx_harbor]
 other = "Harbor"
+
+[gpx_unit_toggle]
+other = "Toggle units: kilometers (km) / nautical miles (nm)"
+
+[gpx_fullscreen]
+other = "Fullscreen"
+
+[gpx_layer_harbors]
+other = "Harbors"
+
+[gpx_layer_sea_profile]
+other = "Sea depth profile"
+
+[gpx_duration]
+other = "Duration"
