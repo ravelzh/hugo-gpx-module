@@ -95,6 +95,18 @@ const fail = (name, detail) => { failed++; console.log(`  FAIL ${name}\n       $
   else pass('UI strings come from config.txt', `${usesTxt} usages`);
 }
 
+// --------------------------------------------------------- XSS / escaping
+// Route names come from user-supplied GPX files and must be escaped before
+// they reach innerHTML. i18n strings are admin-controlled but quoted in HTML
+// attributes, so they are escaped too.
+{
+  const js = readFileSync(JS, 'utf8');
+  const expected = ['escapeHtml(d.name)', 'escapeHtml(this.config.txt.download)', 'escapeHtml(this.config.txt.duration)'];
+  const missing = expected.filter(s => !js.includes(s));
+  if (missing.length) fail('route selector escapes user text', `missing: ${missing.join(', ')}`);
+  else pass('route selector escapes user text');
+}
+
 // ------------------------------------------------------------ css delivery
 // The stylesheet is plain CSS; it must not go through a Sass transpiler again
 // (libsass raised a deprecation warning in Hugo >= 0.153).

@@ -330,6 +330,17 @@ try {
     await page.close();
   }
 
+  section('Assets emitted once per page');
+  {
+    const html = await readFile(join(SITE, 'public/index.html'), 'utf8');
+    const scripts = [...html.matchAll(/<script src="([^"]*)"/g)].map(m => m[1]);
+    const styles = [...html.matchAll(/<link rel="stylesheet" href="([^"]*)"/g)].map(m => m[1]);
+    check('5 maps load the module script once', scripts.filter(s => /gpx-map\.min/.test(s)).length === 1, scripts.join(', '));
+    check('vendor scripts once each', scripts.filter(s => /leaflet\.min/.test(s)).length === 1 && scripts.filter(s => /d3\.min/.test(s)).length === 1, scripts.join(', '));
+    check('module stylesheet once', styles.filter(s => /gpx-module\.min/.test(s)).length === 1, styles.join(', '));
+    check('leaflet stylesheet once', styles.filter(s => /leaflet\.min/.test(s)).length === 1, styles.join(', '));
+  }
+
   section('No IntersectionObserver (fallback path)');
   {
     const page = await ctx.newPage();
