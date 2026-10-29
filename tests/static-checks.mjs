@@ -73,6 +73,24 @@ const fail = (name, detail) => { failed++; console.log(`  FAIL ${name}\n       $
   if (!/function getLeaflet\(\)/.test(readFileSync(JS, 'utf8'))) fail('getLeaflet() helper present', 'missing');
 }
 
+// ------------------------------------------------------------ css delivery
+// The stylesheet is plain CSS; it must not go through a Sass transpiler again
+// (libsass raised a deprecation warning in Hugo >= 0.153).
+{
+  const shortcode = readFileSync(join(ROOT, 'layouts/shortcodes/gpx-map.html'), 'utf8');
+  const usesSass = /\btoCSS\b|css\.Sass|\.scss/.test(shortcode);
+  if (usesSass) fail('stylesheet is not transpiled with Sass', 'found toCSS/css.Sass/.scss in the shortcode');
+  else pass('stylesheet is not transpiled with Sass');
+
+  try {
+    const css = readFileSync(join(ROOT, 'assets/hugo-gpx-module/css/style.css'), 'utf8');
+    if (css.length < 1000) fail('styles are shipped as plain CSS', `only ${css.length} bytes`);
+    else pass('styles are shipped as plain CSS', `${Math.round(css.length / 1024)} kB`);
+  } catch {
+    fail('styles are shipped as plain CSS', 'assets/hugo-gpx-module/css/style.css missing');
+  }
+}
+
 // ------------------------------------------------------------- changelog
 {
   const text = readFileSync(CHANGELOG, 'utf8');

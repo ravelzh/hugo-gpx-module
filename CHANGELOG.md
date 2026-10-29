@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.5] - 2026-10-29
+
+### Changed
+- **CSS pipeline:** the stylesheet is plain CSS and is now shipped as `assets/hugo-gpx-module/css/style.css` and minified, instead of being compiled with libsass. Removes the `css.Sass` deprecation warning with Hugo ≥ 0.153 and no longer needs a Sass transpiler. Rendered styles are unchanged.
+
+### Added
+- **Tests:** static checks and the browser smoke test now guard the stylesheet delivery as well.
+
 ## [1.5.4] - 2026-10-29
 
 ### Fixed
