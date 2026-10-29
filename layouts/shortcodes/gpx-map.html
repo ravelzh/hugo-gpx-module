@@ -144,8 +144,7 @@ Licensed under the Apache License, Version 2.0
 <script src="{{ $d3Js.RelPermalink }}" integrity="{{ $d3Js.Data.Integrity }}" crossorigin="anonymous"></script>
 
 {{- /* 5.2 Module Assets */ -}}
-{{- $style := resources.Get "hugo-gpx-module/scss/style.scss" | toCSS (dict "targetPath" "css/gpx-module.css"
-"outputStyle" "compressed") | fingerprint -}}
+{{- $style := resources.Get "hugo-gpx-module/css/style.css" | minify | resources.Copy "css/gpx-module.css" | fingerprint -}}
 <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
 
 {{- $script := resources.Get "hugo-gpx-module/js/gpx-map.js" | minify | fingerprint -}}

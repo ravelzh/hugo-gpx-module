@@ -227,6 +227,30 @@ try {
     await page.close();
   }
 
+  section('Stylesheet delivery');
+  {
+    const { page, errors } = await loadPage(ctx, base + '/', { origin: base });
+    await page.locator('.gpx-map').first().scrollIntoViewIfNeeded();
+    await wait(1500);
+    const css = await page.evaluate(() => {
+      const link = [...document.querySelectorAll('link[rel=stylesheet]')].map(l => l.href).find(h => h.includes('gpx-module'));
+      const cs = getComputedStyle(document.querySelector('.gpx-map-container'));
+      const chart = getComputedStyle(document.querySelector('.elevation-chart-wrapper'));
+      return {
+        link: !!link,
+        isolation: cs.isolation,
+        zIndex: cs.zIndex,
+        position: cs.position,
+        chartRadius: chart.borderRadius,
+      };
+    });
+    check('module stylesheet linked', css.link);
+    check('styles reach the browser (container isolated)', css.isolation === 'isolate' && css.zIndex === '1' && css.position === 'relative', JSON.stringify(css));
+    check('chart styling applied', css.chartRadius === '8px', JSON.stringify(css));
+    check('no console errors', errors.length === 0, errors.join('\n       '));
+    await page.close();
+  }
+
   section('Lazy loading stays lazy');
   {
     const { page, errors } = await loadPage(ctx, base + '/');
