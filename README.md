@@ -58,6 +58,9 @@ hugo mod get github.com/ravelzh/hugo-gpx-module
 hugo mod tidy
 ```
 
+Without a version suffix this resolves to the newest stable release; pre-releases such as
+`v1.6.0-rc.1` are never picked automatically. See [Versioning & Updates](USAGE.md#-versioning--updates).
+
 ## 🚀 Quick Start
 
 To display a map, simply use the `gpx-map` shortcode in your Markdown content. The GPX file should be located in your `static/` folder or within a Page Bundle.

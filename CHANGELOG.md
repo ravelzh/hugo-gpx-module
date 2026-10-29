@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Docs:** added a versioning section. Without a version suffix `hugo mod get` resolves to the newest stable tag, pre-releases are ignored, updates need `hugo mod get -u`.
+
 ## [1.5.5] - 2026-10-29
 
 ### Changed

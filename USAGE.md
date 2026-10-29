@@ -138,3 +138,21 @@ Any parameter set in the shortcode will override the global configuration.
 ```go
 {{< gpx-map file="tour.gpx" show-route-selector="false" >}}
 ```
+
+## 🔢 Versioning & Updates
+
+Releases are semver tags on `main` (e.g. `v1.5.5`). There is no separate stable branch: a plain
+`hugo mod get github.com/ravelzh/hugo-gpx-module` resolves to the newest release, and tags with a
+pre-release suffix (e.g. `v1.6.0-rc.1`) are never selected automatically.
+
+### Updating an existing site
+
+The version is pinned in your `go.mod`, so updates are deliberate:
+
+```bash
+hugo mod get -u github.com/ravelzh/hugo-gpx-module
+hugo mod tidy
+```
+
+Go modules have no version ranges. A future `v2.0.0` would also require a new module path
+(`.../v2`); all `v1.x` releases stay backwards compatible.
