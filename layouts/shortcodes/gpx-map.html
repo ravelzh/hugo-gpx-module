@@ -100,12 +100,23 @@ Licensed under the Apache License, Version 2.0
 
 {{- $gpxFiles := slice -}}
 {{- range $rawFiles -}}
-  {{- $resolved := . -}}
-  {{- with $.Page.Resources.GetMatch . -}}
+  {{- $path := . -}}
+  {{- $resolved := $path -}}
+  {{- with $.Page.Resources.GetMatch $path -}}
     {{- $resolved = .RelPermalink -}}
   {{- else -}}
-    {{- with resources.Get . -}}
+    {{- with resources.Get $path -}}
       {{- $resolved = .RelPermalink -}}
+    {{- else -}}
+      {{- /* 3rd priority: static file / URL. Plain relative paths are resolved
+             against the baseURL so they also work on nested pages. */ -}}
+      {{- if and
+            (not (hasPrefix $path "/"))
+            (not (hasPrefix $path "./"))
+            (not (hasPrefix $path "../"))
+            (not (findRE `^[a-zA-Z][a-zA-Z0-9+.-]*:` $path)) -}}
+        {{- $resolved = $path | relURL -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
   {{- $gpxFiles = $gpxFiles | append $resolved -}}

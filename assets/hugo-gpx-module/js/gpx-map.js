@@ -1,6 +1,14 @@
 (function (global) {
   'use strict';
 
+  // Resolve Leaflet from window.L on each use: a page-level `const L` shadows
+  // the bare identifier and breaks every map.
+  function getLeaflet() {
+    const leaflet = global.L;
+    if (!leaflet || typeof leaflet.map !== 'function' || !leaflet.control) return null;
+    return leaflet;
+  }
+
   class GPXMapHandler {
     constructor(mapId, statsId, gpxFiles, config) {
       this.mapId = mapId;
@@ -82,12 +90,25 @@
     }
 
     async init() {
-      if (typeof L === 'undefined') { setTimeout(() => this.init(), 50); return; }
+      const L = getLeaflet();
+      if (!L) {
+        // Leaflet not available yet.
+        this._leafletRetries = (this._leafletRetries || 0) + 1;
+        if (this._leafletRetries > 100) {
+          console.error("GPX Init Error: Leaflet (window.L) is not available");
+          return;
+        }
+        setTimeout(() => this.init(), 50);
+        return;
+      }
+      this._leafletRetries = 0;
       try { await this.initMap(); await this.loadGPXFiles(); }
       catch (err) { console.error("GPX Init Error:", err); }
     }
 
     async initMap() {
+      const L = getLeaflet();
+      if (!L) return Promise.reject('Leaflet (window.L) not available');
       return new Promise((resolve, reject) => {
         const el = document.getElementById(this.mapId);
         if (!el) return reject('Map element missing');
@@ -210,6 +231,8 @@
     }
 
     async loadHarbors() {
+      const L = getLeaflet();
+      if (!L) return;
       if (!this.harborLayer || !this.map.hasLayer(this.harborLayer)) return;
 
       if (this.map.getZoom() < 10) {
@@ -322,6 +345,8 @@
     }
 
     async loadSingleGPX(file, index) {
+      const L = getLeaflet();
+      if (!L) return;
       const response = await fetch(file);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -394,6 +419,8 @@
     }
 
     addStartEndMarkers(index, geojson) {
+      const L = getLeaflet();
+      if (!L) return;
       const markers = L.layerGroup();
       geojson.features.forEach(f => {
         const coords = f.geometry.coordinates;
@@ -492,6 +519,8 @@
     }
 
     _drawElevationProfile() {
+      const L = getLeaflet();
+      if (!L) return;
       const containerId = `${this.mapId}-elevation`;
       const container = document.getElementById(containerId);
       const tooltip = document.getElementById(`${this.mapId}-ele-tooltip`);
@@ -499,11 +528,21 @@
       const data = this._prepareElevationData();
       if (data.length === 0) { container.style.display = 'none'; if (this.focusMarker) this.focusMarker.remove(); return; }
       container.style.display = 'block';
-      d3.select("#" + containerId).selectAll("svg").remove();
 
       const margin = { top: 10, right: 5, bottom: 20, left: 35 };
       const width = container.clientWidth - margin.left - margin.right;
       const height = container.clientHeight - margin.top - margin.bottom;
+      if (width <= 0 || height <= 0) {
+        // No layout size yet (fullscreen or hidden container): drawing would
+        // produce negative SVG dimensions. Retry after the layout pass.
+        this._eleRetries = (this._eleRetries || 0) + 1;
+        if (this._eleRetries <= 20) setTimeout(() => this._drawElevationProfile(), 100);
+        return;
+      }
+      this._eleRetries = 0;
+
+      d3.select("#" + containerId).selectAll("svg").remove();
+
       const color = this.config.ele.color;
       const svg = d3.select("#" + containerId).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
       const x = d3.scaleLinear().domain(d3.extent(data, d => this.isNautical ? d.dist * 0.539957 : d.dist)).range([0, width]);
@@ -631,6 +670,7 @@
     updateAllComponents() { this.createRouteSelector(); if (this.config.showStats) this.calculateAndShowTotalStats(); this._drawElevationProfile(); }
 
     fitToRoutes() {
+      const L = getLeaflet(); if (!L) return;
       const layers = []; this.routeLayers.forEach(l => { if (this.map.hasLayer(l)) layers.push(l); });
       if (layers.length) this.map.flyToBounds(L.featureGroup(layers).getBounds(), { padding: [20, 20], duration: 1.5 });
     }
