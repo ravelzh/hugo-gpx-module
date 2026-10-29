@@ -7,7 +7,7 @@ This module provides the `gpx-map` shortcode for Hugo. It allows you to embed in
 To display a single GPX file, simply provide the path or filename. The module automatically resolves files in the following priority:
 1. **Page Bundle Resource**: A file in the same folder as the current page (e.g., `file="track.gpx"`). This supports multilingual setups.
 2. **Global Asset**: A file located in `assets/`.
-3. **Static File / URL**: A file in `static/` (e.g., `file="/gpx/track.gpx"`) or a full external URL.
+3. **Static File / URL**: A file in `static/` (e.g., `file="/gpx/track.gpx"`) or a full external URL. Plain relative paths such as `file="track.gpx"` are resolved against the site `baseURL`; paths starting with `/`, `./` or `../` are used verbatim.
 
 ### Single Route
 

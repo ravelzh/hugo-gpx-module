@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.4] - 2026-10-29
+
+### Fixed
+- **Leaflet global shadowing:** Leaflet is read from `window.L` via `getLeaflet()` instead of the bare identifier `L`, so a page-level `const L = ...` no longer breaks every map with `L.map is not a function`. Based on the fix in [karstenmueller/hugo-gpx-module](https://github.com/karstenmueller/hugo-gpx-module).
+- **Missing Leaflet:** init retries for about 5 seconds, then logs `GPX Init Error: Leaflet (window.L) is not available` instead of retrying forever.
+- **Relative GPX paths:** `file="track.gpx"` is resolved against the site `baseURL` instead of the page URL, so nested pages no longer fail with a 404. Paths starting with `/`, `./`, `../` and absolute URLs are unchanged.
+- **Elevation chart:** no longer drawn while its container has no layout size (fullscreen, hidden tabs), which produced negative SVG dimensions and console errors.
+
+### Changed
+- **exampleSite:** `marine.md` map loads again (path fix above); added a `favicon.ico`.
+
+### Added
+- **Tests:** `tests/` with dependency-free static checks and a Playwright smoke test.
+
 ## [1.5.3] - 2026-03-26
 
 ### Added

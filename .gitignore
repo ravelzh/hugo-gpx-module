@@ -11,3 +11,6 @@ public/
 Thumbs.db
 /resources
 /exampleSite/resources
+
+# Tests
+/tests/.tmp/
