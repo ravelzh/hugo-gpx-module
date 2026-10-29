@@ -5,10 +5,19 @@ All notable changes to the Hugo GPX Module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.6] - 2026-10-29
+
+### Fixed
+- **Elevation chart units:** the chart ignored nautical mode and always showed km, because `isNautical` was never set. Axis and tooltip now follow the km/nm toggle.
+- **Harbor popups:** names, websites and phone numbers from the Overpass API are escaped, and website links are limited to http/https.
+- **Translations:** layer names "Häfen"/"Meeresprofil", the fullscreen title, the duration label and the unit-toggle aria-label are no longer hardcoded (`gpx_layer_harbors`, `gpx_layer_sea_profile`, `gpx_fullscreen`, `gpx_duration`, `gpx_unit_toggle`).
+- **exampleSite:** `languageCode` replaced by `locale` (deprecated since Hugo 0.158), taxonomies disabled to silence the missing-layout warning.
 
 ### Changed
 - **Docs:** added a versioning section. Without a version suffix `hugo mod get` resolves to the newest stable tag, pre-releases are ignored, updates need `hugo mod get -u`.
+
+### Added
+- **Tests:** i18n key parity, a guard against hardcoded UI strings, and coverage for the km/nm toggle.
 
 ## [1.5.5] - 2026-10-29
 

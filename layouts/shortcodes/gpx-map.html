@@ -75,6 +75,11 @@ Licensed under the Apache License, Version 2.0
 {{- $txtLayerTopo := T "gpx_layer_topo" | default "Topographic" -}}
 {{- $txtLayerSatellite := T "gpx_layer_satellite" | default "Satellite" -}}
 {{- $txtSeamarks := T "gpx_layer_seamarks" | default "Seamarks" -}}
+{{- $txtHarbors := T "gpx_layer_harbors" | default "Harbors" -}}
+{{- $txtSeaProfile := T "gpx_layer_sea_profile" | default "Sea depth profile" -}}
+{{- $txtUnitToggle := T "gpx_unit_toggle" | default "Toggle units: kilometers (km) / nautical miles (nm)" -}}
+{{- $txtFullscreen := T "gpx_fullscreen" | default "Fullscreen" -}}
+{{- $txtDuration := T "gpx_duration" | default "Duration" -}}
 {{- $osmUrl := $gpxConf.osmUrl | default "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" -}}
 {{- $osmAttr := $gpxConf.osmAttr | default "© OpenStreetMap" -}}
 {{- $topoUrl := $gpxConf.topoUrl | default "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" -}}
@@ -183,9 +188,9 @@ Licensed under the Apache License, Version 2.0
         <div class="gpx-route-controls">
           {{- if eq (printf "%v" $showUnitToggle) "true" -}}
           <button type="button" class="gpx-btn gpx-unit-btn" id="{{ $id }}-unit-toggle" data-action="unit-toggle"
-            aria-label="Toggle units: Kilometers (km) / Nautical Miles (nm)"
+            aria-label="{{ $txtUnitToggle }}"
             style="background: #0056b3; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.5rem; margin-right: 0.25rem; cursor: pointer; font-size: 0.8rem; min-width: 2.5rem;"
-            title="Einheiten umschalten: Kilometer (km) ↔ Seemeilen (nm)">nm</button>
+            title="{{ $txtUnitToggle }}">nm</button>
           {{- end -}}
           <button type="button" class="gpx-btn" id="{{ $id }}-btn-ele" data-action="toggle-elevation"
             aria-label="{{ $txtProfile }}"
@@ -270,6 +275,10 @@ Licensed under the Apache License, Version 2.0
       website: '{{ $txtWebsite }}',
       phone: '{{ $txtPhone }}',
       harbor: '{{ $txtHarbor }}',
+      harbors: '{{ $txtHarbors }}',
+      seaProfile: '{{ $txtSeaProfile }}',
+      fullscreen: '{{ $txtFullscreen }}',
+      duration: '{{ $txtDuration }}',
       distance: '{{ $txtDist }}'
     }
   };

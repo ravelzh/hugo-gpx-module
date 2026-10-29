@@ -9,6 +9,20 @@
     return leaflet;
   }
 
+  // Third-party text (e.g. OSM tags) must never reach innerHTML unescaped.
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function safeHttpUrl(value) {
+    try {
+      const url = new URL(value, global.location.href);
+      return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : null;
+    } catch { return null; }
+  }
+
   class GPXMapHandler {
     constructor(mapId, statsId, gpxFiles, config) {
       this.mapId = mapId;
@@ -151,7 +165,7 @@
             btn.style.fontSize = '18px';
             btn.style.color = '#333';
             btn.innerHTML = '⛶';
-            btn.title = "Vollbild";
+            btn.title = this.config.txt.fullscreen;
 
             btn.onclick = (e) => {
               e.stopPropagation();
@@ -176,13 +190,14 @@
         const overlayMaps = {};
 
         const seamarksEnabled = this.config.showSeamarks === true || this.config.showSeamarks === 'true';
+        const harborsLabel = this.config.txt.harbors;
         if (seamarksEnabled) {
           const sea = L.tileLayer(this.config.tiles.sea.url, { attribution: this.config.tiles.sea.attr });
 
           // WMS Layers for Marine Features
           const wmsUrl = 'https://geoserver.openseamap.org/geoserver/wms';
 
-          // Meeresprofil: Gebco 2021 Shaded Relief
+          // Sea depth profile: GEBCO 2021 shaded relief
           const meeresprofil = L.tileLayer.wms(wmsUrl, {
             layers: 'gebco2021:gebco_2021',
             format: 'image/png',
@@ -193,12 +208,12 @@
 
 
           overlayMaps[this.config.txt.seamarks] = sea;
-          overlayMaps["Häfen"] = L.layerGroup(); // Placeholder for vector layer
-          overlayMaps["Meeresprofil"] = meeresprofil;
+          overlayMaps[harborsLabel] = L.layerGroup(); // Placeholder for vector layer
+          overlayMaps[this.config.txt.seaProfile] = meeresprofil;
 
           // Activate Seamarks by default
           sea.addTo(this.map);
-          this.harborLayer = overlayMaps["Häfen"];
+          this.harborLayer = overlayMaps[harborsLabel];
         }
 
         if (this.config.defaultLayer === 'satellite') satellite.addTo(this.map);
@@ -210,13 +225,13 @@
         // Bind Harbor Events
         if (seamarksEnabled && this.harborLayer) {
           this.map.on('overlayadd', e => {
-            if (e.name === "Häfen") {
+            if (e.name === harborsLabel) {
               this.loadHarbors();
               this.map.on('moveend', this._harborHandler);
             }
           });
           this.map.on('overlayremove', e => {
-            if (e.name === "Häfen") {
+            if (e.name === harborsLabel) {
               this.map.off('moveend', this._harborHandler);
               this.harborLayer.clearLayers();
             }
@@ -279,10 +294,11 @@
               })
             });
 
-            let content = `<b>${name}</b>`;
+            let content = `<b>${escapeHtml(name)}</b>`;
             if (el.tags) {
-              if (el.tags.website) content += `<br><a href="${el.tags.website}" target="_blank">${this.config.txt.website}</a>`;
-              if (el.tags.phone) content += `<br>${this.config.txt.phone}: ${el.tags.phone}`;
+              const website = el.tags.website ? safeHttpUrl(el.tags.website) : null;
+              if (website) content += `<br><a href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer">${escapeHtml(this.config.txt.website)}</a>`;
+              if (el.tags.phone) content += `<br>${escapeHtml(this.config.txt.phone)}: ${escapeHtml(el.tags.phone)}`;
             }
             marker.bindPopup(content);
             this.harborLayer.addLayer(marker);
@@ -545,13 +561,13 @@
 
       const color = this.config.ele.color;
       const svg = d3.select("#" + containerId).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-      const x = d3.scaleLinear().domain(d3.extent(data, d => this.isNautical ? d.dist * 0.539957 : d.dist)).range([0, width]);
+      const x = d3.scaleLinear().domain(d3.extent(data, d => this.useNauticalMiles ? d.dist * 0.539957 : d.dist)).range([0, width]);
       const yExtent = d3.extent(data, d => d.ele);
       const yPadding = (yExtent[1] - yExtent[0]) * 0.1;
       const y = d3.scaleLinear().domain([yExtent[0] - yPadding, yExtent[1] + yPadding]).range([height, 0]);
 
-      svg.append("path").datum(data).attr("fill", color).attr("fill-opacity", 0.2).attr("stroke", color).attr("stroke-width", 2).attr("d", d3.area().x(d => x(this.isNautical ? d.dist * 0.539957 : d.dist)).y0(height).y1(d => y(d.ele)));
-      svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(5).tickFormat(d => d.toFixed(1) + (this.isNautical ? " nm" : " km")));
+      svg.append("path").datum(data).attr("fill", color).attr("fill-opacity", 0.2).attr("stroke", color).attr("stroke-width", 2).attr("d", d3.area().x(d => x(this.useNauticalMiles ? d.dist * 0.539957 : d.dist)).y0(height).y1(d => y(d.ele)));
+      svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(5).tickFormat(d => d.toFixed(1) + (this.useNauticalMiles ? " nm" : " km")));
       svg.append("g").call(d3.axisLeft(y).ticks(5));
 
       const focusCircle = svg.append("circle").attr("class", "elevation-focus-circle").attr("r", 5).attr("fill", this.config.markerEndColor).style("opacity", 0);
@@ -606,7 +622,7 @@
         div.style.borderLeft = `5px solid ${visible ? d.color : '#ccc'}`;
         div.onmouseenter = () => this.highlightRoute(id, true);
         div.onmouseleave = () => this.highlightRoute(id, false);
-        const timeStr = s.duration ? `<span class="route-stat-pill gpx-text-muted" title="Duration">⏱ ${this.formatTime(s.duration)}</span>` : '';
+        const timeStr = s.duration ? `<span class="route-stat-pill gpx-text-muted" title="${this.config.txt.duration}">⏱ ${this.formatTime(s.duration)}</span>` : '';
         const showEleInfo = String(this.config.ele.info) !== 'false';
         let elePills = '';
         if (showEleInfo) {
